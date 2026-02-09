@@ -83,6 +83,13 @@
             box-shadow: 0 10px 40px rgba(103, 178, 111, 0.3);
             border-color: #67b26f;
         }
+        .download-card.map {
+            border-color: #e67e22;
+        }
+        .download-card.map:hover {
+            box-shadow: 0 10px 40px rgba(230, 126, 34, 0.3);
+            border-color: #e67e22;
+        }
         .download-card h3 {
             font-size: 1.8em;
             margin-bottom: 15px;
@@ -92,6 +99,9 @@
         }
         .download-card.server h3 {
             color: #67b26f;
+        }
+        .download-card.map h3 {
+            color: #e67e22;
         }
         .download-card p {
             color: #a0a0a0;
@@ -112,6 +122,10 @@
         }
         .download-btn.server {
             background: linear-gradient(45deg, #67b26f, #4a9c52);
+            color: white;
+        }
+        .download-btn.map {
+            background: linear-gradient(45deg, #e67e22, #d35400);
             color: white;
         }
         .download-btn:hover {
@@ -265,7 +279,7 @@
         <header>
             <div class="moon">🌕</div>
             <h1>🐺 LA MEUTE 🐺</h1>
-            <p class="subtitle">Loup-Garou Minecraft - Style Squeezie</p>
+            <p class="subtitle">Loup-Garou Minecraft</p>
             <span class="version-badge">Minecraft 1.20.1 • Forge 47.2.0</span>
         </header>
 
@@ -286,6 +300,14 @@
                     ⬇️ Télécharger Serveur
                 </a>
                 <span class="download-size">~34 MB • Forge 1.20.1</span>
+            </div>
+            <div class="download-card map">
+                <h3>🗺️ Map</h3>
+                <p>Le village de Thiercelieux.<br>Arène de vote + décors.</p>
+                <a href="LaMeute-Map.zip" class="download-btn map" download>
+                    ⬇️ Télécharger Map
+                </a>
+                <span class="download-size">Bientôt disponible</span>
             </div>
         </div>
 
@@ -407,7 +429,6 @@
         </div>
 
         <footer>
-            <p>Modpack inspiré des vidéos de Squeezie</p>
             <p>Minecraft 1.20.1 • Forge 47.2.0 • KubeJS</p>
             <p class="credits">🐺 Développé par w9n0 🐺</p>
         </footer>
