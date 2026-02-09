@@ -31,12 +31,33 @@ et une ambiance sombre à couper le souffle.
 - Pleine lune = danger maximum
 - Nouvelle lune = période de calme
 
-### ⚗️ RÔLES & POUVOIRS
-- **Voyante** : Voir l'aura des joueurs
+### ⚗️ RÔLES & POUVOIRS (20 rôles)
+
+**🐺 Équipe Loups :**
+- **Loup-Garou** : Dévore un villageois chaque nuit
+- **Loup Blanc** : Tue aussi un loup une nuit sur deux
+- **Loup Alpha** : Peut infecter un villageois
+- **Infecté** : Villageois converti (semble villageois)
+
+**🏠 Équipe Village :**
+- **Villageois** : Vote pour éliminer les loups
+- **Voyante** : Découvre le rôle d'un joueur
 - **Sorcière** : Potions de vie et de mort
-- **Chasseur** : Armes en argent puissantes
-- **Cupidon** : Liens d'amour entre joueurs
-- **Salvateur** : Protection nocturne
+- **Chasseur** : Tire sur quelqu'un en mourant
+- **Cupidon** : Lie deux amoureux à jamais
+- **Salvateur** : Protège un joueur la nuit
+- **Petite Fille** : Peut espionner les loups
+- **Ancien** : Résiste à la première attaque
+- **Idiot du Village** : Survit au vote du village
+- **Corbeau** : Accuse un joueur (+2 votes contre lui)
+- **Renard** : Détecte si un loup est parmi 3 joueurs
+- **Bouc Émissaire** : Meurt en cas d'égalité au vote
+- **Sorcière Noire** : Maudit un joueur (le votant meurt)
+- **Chevalier** : Si un loup le tue, le loup meurt aussi
+
+**⭐ Solitaires :**
+- **Ange** : Doit mourir au premier vote pour gagner
+- **Joueur de Flûte** : Charme tous les joueurs pour gagner
 
 ### 🎭 AMBIANCE HORRIFIQUE
 - Brouillard dynamique la nuit
@@ -198,6 +219,15 @@ et une ambiance sombre à couper le souffle.
 ---
 
 ## 📝 CHANGELOG
+
+### v1.1.0 - La Grande Meute
+- 🎭 **20 rôles jouables** (10 nouveaux !)
+- 🐺 Loup Blanc, Loup Alpha, Infecté
+- 😇 Ange, Joueur de Flûte (rôles solo)
+- 🦊 Renard, Corbeau, Chevalier, Sorcière Noire, Bouc Émissaire
+- 🔄 Système de distribution automatique
+- ⏱️ Timer de jeu intégré
+- 🏟️ Système d'arène avec /lameute arene
 
 ### v1.0.0 - Première Meute
 - 🐺 Système de loup-garou complet
