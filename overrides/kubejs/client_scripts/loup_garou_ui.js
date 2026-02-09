@@ -1,15 +1,10 @@
-// 🐺 LA MEUTE - Scripts Client KubeJS
-// ====================================
+// 🐺 LA MEUTE - Client Scripts
+// Développé par w9n0
 
-// Affichage de la phase lunaire
 ClientEvents.tick(event => {
-    // Ce script peut être étendu pour afficher la phase de lune
-    // et d'autres éléments d'interface thématiques
 });
 
-// Tooltip personnalisé pour les objets du modpack
 ItemEvents.tooltip(event => {
-    // Épée en fer = Épée en argent dans notre contexte
     event.add('minecraft:iron_sword', [
         '',
         '§7§o"L\'argent est la seule faiblesse des loups..."',

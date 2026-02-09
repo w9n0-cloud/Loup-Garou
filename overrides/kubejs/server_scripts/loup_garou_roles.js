@@ -1,18 +1,12 @@
-// 🐺 LA MEUTE - Scripts KubeJS pour les rôles du Loup-Garou
-// ==========================================================
+// 🐺 LA MEUTE - Loup-Garou Minecraft
 // Développé par w9n0
-// ==========================================================
-
-// Ce script ajoute des fonctionnalités de jeu Loup-Garou
 
 // ============================================
-// 🏷️ SYSTÈME DE TITRES (TAB & CHAT)
+// 🏷️ SYSTÈME DE TITRES
 // ============================================
 
-// Stockage des titres personnalisés des joueurs
 let playerTitles = {};
 
-// Titres prédéfinis avec leurs couleurs
 const titleColors = {
     'dev': '§b§l[DEV] ',
     'maitre du jeu': '§6§l[MJ] ',
@@ -32,40 +26,32 @@ function getFormattedTitle(title) {
     if (titleColors[lowerTitle]) {
         return titleColors[lowerTitle];
     }
-    // Titre personnalisé avec couleur dorée par défaut
     return '§e§l[' + title + '] ';
 }
 
-// Fonction pour mettre à jour le display name d'un joueur
 function updatePlayerDisplayName(player) {
     const playerName = player.name.string;
     const title = playerTitles[playerName] || 'Joueur';
     const formattedTitle = getFormattedTitle(title);
-    
-    // Mettre à jour le nom dans le TAB et au-dessus de la tête
     const displayName = formattedTitle + '§f' + playerName;
     player.displayName = displayName;
-    
-    // Mettre à jour via la commande team pour le TAB
     player.server.runCommandSilent('team add title_' + playerName.replace(/[^a-zA-Z0-9]/g, '') + ' ""');
     player.server.runCommandSilent('team join title_' + playerName.replace(/[^a-zA-Z0-9]/g, '') + ' ' + playerName);
     player.server.runCommandSilent('team modify title_' + playerName.replace(/[^a-zA-Z0-9]/g, '') + ' prefix ' + JSON.stringify({"text":formattedTitle.replace(/§/g, '\u00A7')}));
 }
 
 // ============================================
-// 📍 SYSTÈME D'ARÈNE ET TÉLÉPORTATION
+// 📍 SYSTÈME D'ARÈNE
 // ============================================
 
-// Position de l'arène (centre du cercle)
 let arenaCenter = {
     x: 0,
     y: 100,
     z: 0,
     set: false,
-    radius: 5  // Rayon du cercle en blocs
+    radius: 5
 };
 
-// Fonction pour TP tous les joueurs en cercle autour du centre
 function teleportPlayersInCircle(server) {
     let players = [];
     server.players.forEach(p => {
@@ -87,33 +73,26 @@ function teleportPlayersInCircle(server) {
         const z = arenaCenter.z + Math.sin(angle) * arenaCenter.radius;
         const y = arenaCenter.y;
         
-        // TP le joueur
         player.server.runCommandSilent('tp ' + player.name.string + ' ' + x.toFixed(1) + ' ' + y + ' ' + z.toFixed(1));
-        
-        // Faire regarder le joueur vers le centre
-        const lookX = arenaCenter.x;
-        const lookZ = arenaCenter.z;
-        player.server.runCommandSilent('tp ' + player.name.string + ' ' + x.toFixed(1) + ' ' + y + ' ' + z.toFixed(1) + ' facing ' + lookX + ' ' + y + ' ' + lookZ);
+        player.server.runCommandSilent('tp ' + player.name.string + ' ' + x.toFixed(1) + ' ' + y + ' ' + z.toFixed(1) + ' facing ' + arenaCenter.x + ' ' + y + ' ' + arenaCenter.z);
     });
     
     return count;
 }
 
 // ============================================
-// ⏰ SYSTÈME DE TIMER AUTOMATIQUE (XP BAR)
+// ⏰ SYSTÈME DE TIMER
 // ============================================
 
-// Configuration du timer
 let timerConfig = {
-    dayDuration: 5,      // Durée du jour en minutes (3, 5 ou 7)
-    nightDuration: 6,    // Durée de la nuit en minutes (max)
-    currentPhase: 'none', // 'day', 'night', 'none'
-    timerStartTime: 0,   // Timestamp de début de phase
+    dayDuration: 5,
+    nightDuration: 6,
+    currentPhase: 'none',
+    timerStartTime: 0,
     timerRunning: false,
-    autoMode: false      // Mode automatique activé
+    autoMode: false
 };
 
-// Stockage des actions de nuit effectuées
 let nightActionsCompleted = {
     loups: false,
     voyante: false,
@@ -121,7 +100,6 @@ let nightActionsCompleted = {
     salvateur: false
 };
 
-// Fonction pour réinitialiser les actions de nuit
 function resetNightActions() {
     nightActionsCompleted = {
         loups: false,
