@@ -5,12 +5,6 @@ ClientEvents.tick(event => {
 });
 
 ItemEvents.tooltip(event => {
-    event.add('minecraft:iron_sword', [
-        '',
-        '§7§o"L\'argent est la seule faiblesse des loups..."',
-        '§c⚔ Dégâts bonus contre les Loups-Garous'
-    ]);
-    
     // Lait = Antidote
     event.add('minecraft:milk_bucket', [
         '',
@@ -53,10 +47,73 @@ ItemEvents.tooltip(event => {
         '§7§oVotre expérience vous protège...'
     ]);
 
-    // Plume = Idiot
+    // Plume = Idiot / Corbeau
     event.add('minecraft:feather', [
         '',
-        '§e🤡 Folie de l\'Idiot',
-        '§7§oOn ne tue pas l\'idiot du village !'
+        '§e🤡 Folie de l\'Idiot §8| §8🐦 Plume du Corbeau',
+        '§7§oAccusez ou faites le fou !'
+    ]);
+
+    // Os avec poudre = Loup Blanc
+    event.add('minecraft:bone_meal', [
+        '',
+        '§f🐺 Marque du Loup Blanc',
+        '§7§oTuez un loup une nuit sur deux...'
+    ]);
+
+    // Teinture blanche = Ange
+    event.add('minecraft:white_dye', [
+        '',
+        '§b😇 Ailes de l\'Ange',
+        '§7§oFaites-vous éliminer au premier vote !'
+    ]);
+
+    // Bâton = Flûte
+    event.add('minecraft:stick', [
+        '',
+        '§d🎵 Flûte Enchanteresse',
+        '§7§oCharmez 2 joueurs par nuit...'
+    ]);
+
+    // Carotte = Renard
+    event.add('minecraft:carrot', [
+        '',
+        '§6🦊 Flair du Renard',
+        '§7§oFlairez si un loup est parmi 3 joueurs'
+    ]);
+
+    // Blé = Bouc Émissaire
+    event.add('minecraft:wheat', [
+        '',
+        '§c🐐 Malédiction du Bouc',
+        '§7§oEn cas d\'égalité, vous mourrez...'
+    ]);
+
+    // Patate empoisonnée = Loup Alpha
+    event.add('minecraft:poisonous_potato', [
+        '',
+        '§4🐺 Infection du Loup Alpha',
+        '§7§oTransformez un villageois en Infecté'
+    ]);
+
+    // Œil d'araignée fermenté = Infecté
+    event.add('minecraft:fermented_spider_eye', [
+        '',
+        '§5🦠 Secret de l\'Infecté',
+        '§7§oVous semblez villageois mais...'
+    ]);
+
+    // Sac d'encre = Sorcière Noire
+    event.add('minecraft:ink_sac', [
+        '',
+        '§0🖤 Malédiction de la Sorcière Noire',
+        '§7§oLe prochain votant mourra...'
+    ]);
+
+    // Épée = Chevalier
+    event.add('minecraft:iron_sword', [
+        '',
+        '§9⚔ Épée du Chevalier',
+        '§7§oSi un loup vous tue, il meurt aussi !'
     ]);
 });
