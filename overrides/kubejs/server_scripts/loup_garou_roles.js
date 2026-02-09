@@ -527,6 +527,76 @@ function revealRoleToPlayer(player, role) {
             roleDescription = 'Si le village vous vote, vous survivez mais ne votez plus.';
             roleItem = 'Votre folie douce';
             break;
+        case 'loup_blanc':
+            roleName = 'LOUP BLANC';
+            roleColor = '§f';
+            roleEmoji = '🐺';
+            roleDescription = 'Loup solitaire : tuez aussi un loup une nuit sur deux !';
+            roleItem = 'OS (victime) | POUDRE D\'OS (loup)';
+            break;
+        case 'ange':
+            roleName = 'ANGE';
+            roleColor = '§b';
+            roleEmoji = '😇';
+            roleDescription = 'Faites-vous éliminer au premier vote pour gagner !';
+            roleItem = 'Votre innocence feinte';
+            break;
+        case 'joueur_flute':
+            roleName = 'JOUEUR DE FLÛTE';
+            roleColor = '§d';
+            roleEmoji = '🎵';
+            roleDescription = 'Charmez tous les joueurs pour gagner seul !';
+            roleItem = 'FLÛTE pour charmer 2 joueurs/nuit';
+            break;
+        case 'corbeau':
+            roleName = 'CORBEAU';
+            roleColor = '§8';
+            roleEmoji = '🐦';
+            roleDescription = 'Accusez un joueur : il aura 2 votes contre lui.';
+            roleItem = 'PLUME pour marquer votre cible';
+            break;
+        case 'renard':
+            roleName = 'RENARD';
+            roleColor = '§6';
+            roleEmoji = '🦊';
+            roleDescription = 'Flairez si un loup est parmi 3 joueurs.';
+            roleItem = 'CAROTTE pour flairer';
+            break;
+        case 'bouc':
+            roleName = 'BOUC ÉMISSAIRE';
+            roleColor = '§c';
+            roleEmoji = '🐐';
+            roleDescription = 'En cas d\'égalité au vote, vous mourrez !';
+            roleItem = 'Votre malchance légendaire';
+            break;
+        case 'loup_alpha':
+            roleName = 'LOUP ALPHA';
+            roleColor = '§4';
+            roleEmoji = '🐺';
+            roleDescription = 'Chef de meute : infectez un villageois !';
+            roleItem = 'OS + POMME EMPOISONNÉE (infection)';
+            break;
+        case 'infect':
+            roleName = 'INFECTÉ';
+            roleColor = '§5';
+            roleEmoji = '🦠';
+            roleDescription = 'Vous semblez Villageois mais êtes avec les loups.';
+            roleItem = 'Votre secret mortel';
+            break;
+        case 'sorciere_noire':
+            roleName = 'SORCIÈRE NOIRE';
+            roleColor = '§0';
+            roleEmoji = '🖤';
+            roleDescription = 'Maudissez un joueur : le prochain à voter contre lui meurt !';
+            roleItem = 'ENCRE pour maudire';
+            break;
+        case 'chevalier':
+            roleName = 'CHEVALIER';
+            roleColor = '§9';
+            roleEmoji = '⚔';
+            roleDescription = 'Protégez le village, si un loup vous tue il meurt aussi !';
+            roleItem = 'ÉPÉE pour vous défendre';
+            break;
         default:
             roleName = 'VILLAGEOIS';
             roleColor = '§a';
@@ -561,7 +631,9 @@ function revealRoleToPlayer(player, role) {
     
     // Ajouter le tag du rôle
     const allRoles = ['loup_garou', 'villageois', 'voyante', 'sorciere', 
-                     'chasseur', 'cupidon', 'salvateur', 'petite_fille', 'ancien', 'idiot'];
+                     'chasseur', 'cupidon', 'salvateur', 'petite_fille', 'ancien', 'idiot',
+                     'loup_blanc', 'ange', 'joueur_flute', 'corbeau', 'renard', 'bouc',
+                     'loup_alpha', 'infect', 'sorciere_noire', 'chevalier'];
     allRoles.forEach(r => player.removeTag(r));
     player.addTag(role);
     
@@ -588,10 +660,42 @@ function revealRoleToPlayer(player, role) {
             player.give('minecraft:shield');
             break;
         case 'ancien':
-            player.give('minecraft:book'); // Savoir des anciens
+            player.give('minecraft:book');
             break;
         case 'idiot':
-            player.give('minecraft:feather'); // Légèreté d'esprit
+            player.give('minecraft:feather');
+            break;
+        case 'loup_blanc':
+            player.give('minecraft:bone');
+            player.give('minecraft:bone_meal');
+            break;
+        case 'ange':
+            player.give('minecraft:white_dye');
+            break;
+        case 'joueur_flute':
+            player.give('minecraft:stick');
+            break;
+        case 'corbeau':
+            player.give('minecraft:feather');
+            break;
+        case 'renard':
+            player.give('minecraft:carrot');
+            break;
+        case 'bouc':
+            player.give('minecraft:wheat');
+            break;
+        case 'loup_alpha':
+            player.give('minecraft:bone');
+            player.give('minecraft:poisonous_potato');
+            break;
+        case 'infect':
+            player.give('minecraft:fermented_spider_eye');
+            break;
+        case 'sorciere_noire':
+            player.give('minecraft:ink_sac');
+            break;
+        case 'chevalier':
+            player.give('minecraft:iron_sword');
             break;
     }
 }
@@ -1444,7 +1548,9 @@ ServerEvents.commandRegistry(event => {
                             // Retirer les anciens rôles
                             const roles = ['loup_garou', 'villageois', 'voyante', 'sorciere', 
                                          'chasseur', 'cupidon', 'salvateur', 'petite_fille', 
-                                         'ancien', 'idiot'];
+                                         'ancien', 'idiot', 'loup_blanc', 'ange', 'joueur_flute',
+                                         'corbeau', 'renard', 'bouc', 'loup_alpha', 'infect',
+                                         'sorciere_noire', 'chevalier'];
                             roles.forEach(r => targetPlayer.removeTag(r));
                             
                             // Ajouter le nouveau rôle
