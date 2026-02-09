@@ -1,0 +1,80 @@
+# Configuration du mod Werewolves - La Meute
+# ==========================================
+
+[general]
+    # Activer la transformation automatique pendant la pleine lune
+    autoTransformOnFullMoon = true
+    
+    # Durée de la transformation en ticks (20 ticks = 1 seconde)
+    transformationDuration = 12000
+    
+    # Les loups-garous peuvent-ils attaquer les villageois ?
+    canAttackVillagers = true
+    
+    # Dégâts bonus en forme de loup
+    wolfFormDamageMultiplier = 2.5
+    
+    # Vitesse bonus en forme de loup
+    wolfFormSpeedMultiplier = 1.8
+
+[moon]
+    # Activer le cycle lunaire
+    enableMoonCycle = true
+    
+    # Durée d'une phase lunaire en jours Minecraft
+    moonPhaseDuration = 1
+    
+    # Nombre de phases lunaires
+    moonPhaseCount = 8
+    
+    # Intensité des effets de pleine lune
+    fullMoonIntensity = 1.0
+
+[combat]
+    # Les armes en argent font des dégâts bonus
+    silverWeaponDamageMultiplier = 3.0
+    
+    # Régénération en forme de loup (cœurs par seconde)
+    wolfRegeneration = 0.5
+    
+    # Résistance aux dégâts normaux
+    normalDamageResistance = 0.3
+
+[pack]
+    # Activer le système de meute
+    enablePackSystem = true
+    
+    # Taille maximale de la meute
+    maxPackSize = 8
+    
+    # Bonus de dégâts par membre de meute proche
+    packDamageBonus = 0.15
+    
+    # Rayon de détection des membres de meute (blocs)
+    packDetectionRadius = 50
+
+[abilities]
+    # Activer la vision nocturne
+    nightVisionEnabled = true
+    
+    # Activer le hurlement (appeler la meute)
+    howlEnabled = true
+    
+    # Cooldown du hurlement en secondes
+    howlCooldown = 60
+    
+    # Activer le saut amélioré
+    enhancedJumpEnabled = true
+    
+    # Hauteur du saut (en blocs)
+    jumpHeight = 3.0
+
+[infection]
+    # Chance d'infecter un joueur mordu (0.0 - 1.0)
+    infectionChance = 0.25
+    
+    # Durée avant la première transformation (en minutes Minecraft)
+    incubationTime = 3
+    
+    # L'infection peut-elle être soignée ?
+    curable = true

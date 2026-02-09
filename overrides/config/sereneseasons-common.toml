@@ -1,0 +1,22 @@
+# Configuration Serene Seasons - La Meute
+# ========================================
+
+[time_settings]
+    # Durée d'une saison en jours Minecraft
+    dayDuration = 24000
+    subSeasonDuration = 8
+    
+    # Commencer en automne pour l'ambiance sombre
+    startingSeason = 2
+
+[aesthetic_settings]
+    # Couleurs d'automne plus prononcées
+    changeGrassColor = true
+    changeFoliageColor = true
+    changeBirchColor = true
+
+[weather_settings]
+    # Plus de tempêtes en automne/hiver
+    enableSnowInWinter = true
+    enableThunderstorms = true
+    stormFrequency = 0.3

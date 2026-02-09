@@ -1,0 +1,321 @@
+# ===============================================
+# 🐺 LA MEUTE - LIENS DE TÉLÉCHARGEMENT DES MODS
+# ===============================================
+# 
+# Développé par w9n0
+# Téléchargez tous les mods ci-dessous et placez-les
+# dans le dossier "mods" de votre instance Minecraft
+#
+# Version: Minecraft 1.20.1 - Forge 47.2.0
+# ===============================================
+
+# ⚠️ IMPORTANT: Téléchargez UNIQUEMENT les versions 1.20.1 FORGE !
+
+# ═══════════════════════════════════════════════
+# 📚 BIBLIOTHÈQUES REQUISES (À INSTALLER EN PREMIER)
+# ═══════════════════════════════════════════════
+
+KubeJS (OBLIGATOIRE - Scripts du jeu)
+https://www.curseforge.com/minecraft/mc-mods/kubejs
+
+Rhino (pour KubeJS)
+https://www.curseforge.com/minecraft/mc-mods/rhino
+
+Architectury API
+https://www.curseforge.com/minecraft/mc-mods/architectury-api
+
+Cloth Config API
+https://www.curseforge.com/minecraft/mc-mods/cloth-config
+
+GeckoLib
+https://www.curseforge.com/minecraft/mc-mods/geckolib
+
+Moonlight Lib
+https://www.curseforge.com/minecraft/mc-mods/selene
+
+Collective
+https://www.curseforge.com/minecraft/mc-mods/collective
+
+Kotlin for Forge
+https://www.curseforge.com/minecraft/mc-mods/kotlin-for-forge
+
+YUNG's API
+https://www.curseforge.com/minecraft/mc-mods/yungs-api
+
+Caelus API
+https://www.curseforge.com/minecraft/mc-mods/caelus
+
+playerAnimator
+https://www.curseforge.com/minecraft/mc-mods/playeranimator
+
+Patchouli
+https://www.curseforge.com/minecraft/mc-mods/patchouli
+
+Domum Ornamentum (pour MineColonies)
+https://www.curseforge.com/minecraft/mc-mods/domum-ornamentum
+
+Structurize (pour MineColonies)
+https://www.curseforge.com/minecraft/mc-mods/structurize
+
+BlockUI (pour MineColonies)
+https://www.curseforge.com/minecraft/mc-mods/blockui
+
+Multi-Piston (pour MineColonies)
+https://www.curseforge.com/minecraft/mc-mods/multi-piston
+
+# ═══════════════════════════════════════════════
+# 🐺 TRANSFORMATION & THÈME LOUP-GAROU
+# ═══════════════════════════════════════════════
+
+Werewolves - Become a Beast!
+https://www.curseforge.com/minecraft/mc-mods/werewolves-become-a-beast
+
+Vampirism - Become a Vampire!
+https://www.curseforge.com/minecraft/mc-mods/vampirism-become-a-vampire
+
+Origins
+https://www.curseforge.com/minecraft/mc-mods/origins-forge
+
+# ═══════════════════════════════════════════════
+# 🏘️ VILLAGES & PNJ
+# ═══════════════════════════════════════════════
+
+MineColonies
+https://www.curseforge.com/minecraft/mc-mods/minecolonies
+
+Guard Villagers
+https://www.curseforge.com/minecraft/mc-mods/guard-villagers
+
+Village Spawn Point
+https://www.curseforge.com/minecraft/mc-mods/village-spawn-point
+
+Villager Names
+https://www.curseforge.com/minecraft/mc-mods/villager-names
+
+Easy Villagers
+https://www.curseforge.com/minecraft/mc-mods/easy-villagers
+
+# ═══════════════════════════════════════════════
+# 🌲 GÉNÉRATION DE MONDE
+# ═══════════════════════════════════════════════
+
+Terralith
+https://www.curseforge.com/minecraft/mc-mods/terralith
+
+Tectonic
+https://www.curseforge.com/minecraft/mc-mods/tectonic
+
+YUNG's Better Villages
+https://www.curseforge.com/minecraft/mc-mods/yungs-better-villages-forge
+
+YUNG's Better Dungeons
+https://www.curseforge.com/minecraft/mc-mods/yungs-better-dungeons-forge
+
+YUNG's Better Strongholds
+https://www.curseforge.com/minecraft/mc-mods/yungs-better-strongholds-forge
+
+YUNG's Better Mineshafts
+https://www.curseforge.com/minecraft/mc-mods/yungs-better-mineshafts-forge
+
+YUNG's Better Ocean Monuments
+https://www.curseforge.com/minecraft/mc-mods/yungs-better-ocean-monuments-forge
+
+YUNG's Extras
+https://www.curseforge.com/minecraft/mc-mods/yungs-extras-forge
+
+# ═══════════════════════════════════════════════
+# 🌙 AMBIANCE & IMMERSION
+# ═══════════════════════════════════════════════
+
+Serene Seasons
+https://www.curseforge.com/minecraft/mc-mods/serene-seasons
+
+AmbientSounds
+https://www.curseforge.com/minecraft/mc-mods/ambientsounds
+
+Sound Physics Remastered
+https://www.curseforge.com/minecraft/mc-mods/sound-physics-remastered
+
+Presence Footsteps
+https://www.curseforge.com/minecraft/mc-mods/presence-footsteps-forge
+
+Simple Voice Chat
+https://www.curseforge.com/minecraft/mc-mods/simple-voice-chat
+
+Dramatic Doors
+https://www.curseforge.com/minecraft/mc-mods/dramatic-doors
+
+Not Enough Animations
+https://www.curseforge.com/minecraft/mc-mods/not-enough-animations
+
+First Person Model
+https://www.curseforge.com/minecraft/mc-mods/first-person-model
+
+# ═══════════════════════════════════════════════
+# ⚔️ COMBAT & SURVIE
+# ═══════════════════════════════════════════════
+
+Better Combat
+https://www.curseforge.com/minecraft/mc-mods/better-combat-by-daedelus
+
+Spartan Weaponry
+https://www.curseforge.com/minecraft/mc-mods/spartan-weaponry
+
+Spartan Shields
+https://www.curseforge.com/minecraft/mc-mods/spartan-shields
+
+Tough As Nails
+https://www.curseforge.com/minecraft/mc-mods/tough-as-nails
+
+First Aid
+https://www.curseforge.com/minecraft/mc-mods/first-aid
+
+Corpse
+https://www.curseforge.com/minecraft/mc-mods/corpse
+
+Combat Roll
+https://www.curseforge.com/minecraft/mc-mods/combat-roll
+
+# ═══════════════════════════════════════════════
+# 🎨 GRAPHISMES & PERFORMANCE
+# ═══════════════════════════════════════════════
+
+Embeddium (Alternative moderne à Rubidium)
+https://www.curseforge.com/minecraft/mc-mods/embeddium
+
+Oculus (Iris pour Forge - Shaders)
+https://www.curseforge.com/minecraft/mc-mods/oculus
+
+Distant Horizons
+https://www.curseforge.com/minecraft/mc-mods/distant-horizons
+
+Entity Culling
+https://www.curseforge.com/minecraft/mc-mods/entityculling
+
+Entity Model Features
+https://www.curseforge.com/minecraft/mc-mods/entity-model-features
+
+Entity Texture Features
+https://www.curseforge.com/minecraft/mc-mods/entity-texture-features-forge
+
+FerriteCore
+https://www.curseforge.com/minecraft/mc-mods/ferritecore
+
+ModernFix
+https://www.curseforge.com/minecraft/mc-mods/modernfix
+
+ImmediatelyFast
+https://www.curseforge.com/minecraft/mc-mods/immediatelyfast
+
+# ═══════════════════════════════════════════════
+# 🏰 CONSTRUCTION MÉDIÉVALE
+# ═══════════════════════════════════════════════
+
+Macaw's Roofs
+https://www.curseforge.com/minecraft/mc-mods/macaws-roofs
+
+Macaw's Doors
+https://www.curseforge.com/minecraft/mc-mods/macaws-doors
+
+Macaw's Windows
+https://www.curseforge.com/minecraft/mc-mods/macaws-windows
+
+Macaw's Fences and Walls
+https://www.curseforge.com/minecraft/mc-mods/macaws-fences-and-walls
+
+Macaw's Bridges
+https://www.curseforge.com/minecraft/mc-mods/macaws-bridges
+
+Macaw's Furniture
+https://www.curseforge.com/minecraft/mc-mods/macaws-furniture
+
+Supplementaries
+https://www.curseforge.com/minecraft/mc-mods/supplementaries
+
+Decorative Blocks
+https://www.curseforge.com/minecraft/mc-mods/decorative-blocks
+
+Create
+https://www.curseforge.com/minecraft/mc-mods/create
+
+Handcrafted
+https://www.curseforge.com/minecraft/mc-mods/handcrafted
+
+# ═══════════════════════════════════════════════
+# 🔧 QUALITÉ DE VIE
+# ═══════════════════════════════════════════════
+
+Just Enough Items (JEI)
+https://www.curseforge.com/minecraft/mc-mods/jei
+
+JourneyMap
+https://www.curseforge.com/minecraft/mc-mods/journeymap
+
+Jade
+https://www.curseforge.com/minecraft/mc-mods/jade
+
+Mouse Tweaks
+https://www.curseforge.com/minecraft/mc-mods/mouse-tweaks
+
+AppleSkin
+https://www.curseforge.com/minecraft/mc-mods/appleskin
+
+Xaero's Minimap
+https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap
+
+Inventory Sorter
+https://www.curseforge.com/minecraft/mc-mods/inventory-sorter
+
+Controlling
+https://www.curseforge.com/minecraft/mc-mods/controlling
+
+Configured
+https://www.curseforge.com/minecraft/mc-mods/configured
+
+FTB Chunks
+https://www.curseforge.com/minecraft/mc-mods/ftb-chunks-forge
+
+FTB Teams
+https://www.curseforge.com/minecraft/mc-mods/ftb-teams-forge
+
+FTB Library
+https://www.curseforge.com/minecraft/mc-mods/ftb-library-forge
+
+Carry On
+https://www.curseforge.com/minecraft/mc-mods/carry-on
+
+# ═══════════════════════════════════════════════
+# 🎨 SHADERS RECOMMANDÉS (OPTIONNELS)
+# ═══════════════════════════════════════════════
+
+# Placez les shaders dans le dossier "shaderpacks"
+
+Complementary Reimagined (Recommandé pour l'ambiance)
+https://modrinth.com/shader/complementary-reimagined
+
+BSL Shaders
+https://modrinth.com/shader/bsl-shaders
+
+Sildur's Vibrant Shaders
+https://www.curseforge.com/minecraft/shaders/sildurs-vibrant-shaders
+
+# ===============================================
+# 📝 NOTES D'INSTALLATION
+# ===============================================
+# 
+# 1. Téléchargez TOUS les mods ci-dessus
+# 2. Vérifiez qu'ils sont pour Minecraft 1.20.1 FORGE
+# 3. Placez les .jar dans le dossier "mods"
+# 4. Placez les shaders dans "shaderpacks"
+# 5. Allouez minimum 6 GB de RAM (8 GB recommandé)
+# 
+# ORDRE D'INSTALLATION:
+# 1. Bibliothèques (en premier !)
+# 2. Mods principaux
+# 3. Mods optionnels
+# 4. Shaders (si votre PC le supporte)
+#
+# ===============================================
+# 🐺 Bonne installation ! 🌕
+# Développé par w9n0
+# ===============================================

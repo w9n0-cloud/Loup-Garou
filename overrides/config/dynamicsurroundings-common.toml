@@ -1,0 +1,31 @@
+# Configuration Dynamic Surroundings - La Meute
+# ==============================================
+
+[sound]
+    # Sons d'ambiance activés
+    enableBackgroundSound = true
+    
+    # Volume des sons de nuit
+    nightSoundVolume = 1.2
+    
+    # Sons de forêt
+    forestSoundsEnabled = true
+    
+    # Sons de loups au loin
+    wolfHowlsEnabled = true
+    wolfHowlFrequency = 0.15
+
+[visual]
+    # Brouillard nocturne
+    enableNightFog = true
+    nightFogDensity = 0.8
+    
+    # Aurores boréales
+    enableAuroras = true
+
+[weather]
+    # Tempêtes plus intenses
+    stormIntensity = 1.5
+    
+    # Éclairs plus fréquents
+    lightningFrequency = 1.2

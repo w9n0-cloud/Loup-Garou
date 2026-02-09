@@ -1,0 +1,27 @@
+# Configuration Tough As Nails - La Meute
+# ========================================
+
+[thirst]
+    # Activer la soif
+    enableThirst = true
+    
+    # Vitesse de déshydratation
+    thirstExhaustionRate = 0.008
+
+[temperature]
+    # Activer la température
+    enableTemperature = true
+    
+    # Nuits plus froides
+    nightTemperatureModifier = -0.4
+    
+    # Danger d'hypothermie la nuit
+    hypothermiaEnabled = true
+
+[difficulty]
+    # Mode survie hardcore
+    hardcoreSurvival = false
+    
+    # Dégâts de froid/soif
+    damageFromTemperature = true
+    damageFromThirst = true

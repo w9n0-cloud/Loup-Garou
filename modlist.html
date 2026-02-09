@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐺 La Meute - Liste des Mods</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        h1 {
+            font-size: 3.5em;
+            color: #ff6b35;
+            text-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+            margin-bottom: 10px;
+        }
+        h1 .wolf {
+            font-size: 1.2em;
+        }
+        .subtitle {
+            font-size: 1.3em;
+            color: #a0a0a0;
+            font-style: italic;
+        }
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #4a90d9, #67b26f);
+            padding: 8px 20px;
+            border-radius: 25px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        .category {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .category h2 {
+            color: #ffd700;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+        }
+        .category h2 .icon {
+            margin-right: 10px;
+        }
+        .mod-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .mod-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ff6b35;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            color: inherit;
+        }
+        .mod-item:hover {
+            transform: translateX(5px) scale(1.02);
+            background: rgba(255, 107, 53, 0.2);
+            box-shadow: 0 5px 25px rgba(255, 107, 53, 0.4);
+            border-left-color: #ffd700;
+        }
+        .mod-item:hover .mod-name {
+            color: #ffd700;
+        }
+        .mod-item:hover .download-icon {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .mod-name {
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+        .download-icon {
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+        .mod-desc {
+            color: #b0b0b0;
+            font-size: 0.9em;
+        }
+        .mod-author {
+            color: #888;
+            font-size: 0.8em;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        .stat-box {
+            background: linear-gradient(145deg, rgba(255, 107, 53, 0.2), rgba(255, 107, 53, 0.05));
+            padding: 25px 40px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 107, 53, 0.3);
+        }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #ff6b35;
+        }
+        .stat-label {
+            color: #a0a0a0;
+            margin-top: 5px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #666;
+        }
+        .moon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        .credits {
+            margin-top: 20px;
+            color: #ff6b35;
+            font-weight: bold;
+        }
+        .click-hint {
+            text-align: center;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="moon">🌕</div>
+            <h1><span class="wolf">🐺</span> LA MEUTE <span class="wolf">🐺</span></h1>
+            <p class="subtitle">Modpack Loup-Garou pour Minecraft</p>
+            <span class="version-badge">Minecraft 1.20.1 • Forge 47.2.0</span>
+        </header>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-number">65+</div>
+                <div class="stat-label">Mods Inclus</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Thème Loup-Garou</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">Heures de Jeu</div>
+            </div>
+        </div>
+
+        <div class="click-hint">
+            💡 <strong>Cliquez sur un mod pour accéder à sa page de téléchargement CurseForge/Modrinth</strong>
+        </div>
+
+        <!-- BIBLIOTHÈQUES REQUISES -->
+        <div class="category">
+            <h2><span class="icon">📚</span>Bibliothèques Requises (Installer en premier !)</h2>
+            <div class="mod-grid">
+                <a href="https://www.curseforge.com/minecraft/mc-mods/kubejs" target="_blank" class="mod-item">
+                    <div class="mod-name">KubeJS <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Scripts personnalisés du modpack (OBLIGATOIRE)</div>
+                    <div class="mod-author">by LatvianModder</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/rhino" target="_blank" class="mod-item">
+                    <div class="mod-name">Rhino <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Moteur JavaScript pour KubeJS</div>
+                    <div class="mod-author">by LatvianModder</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/architectury-api" target="_blank" class="mod-item">
+                    <div class="mod-name">Architectury API <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">API multi-loader</div>
+                    <div class="mod-author">by shedaniel</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/cloth-config" target="_blank" class="mod-item">
+                    <div class="mod-name">Cloth Config API <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Configuration des mods</div>
+                    <div class="mod-author">by shedaniel</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/geckolib" target="_blank" class="mod-item">
+                    <div class="mod-name">GeckoLib <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Animations avancées</div>
+                    <div class="mod-author">by Gecko</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/selene" target="_blank" class="mod-item">
+                    <div class="mod-name">Moonlight Lib <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Bibliothèque utilitaire</div>
+                    <div class="mod-author">by MehVahdJukaar</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/collective" target="_blank" class="mod-item">
+                    <div class="mod-name">Collective <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Bibliothèque partagée</div>
+                    <div class="mod-author">by Serilum</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/kotlin-for-forge" target="_blank" class="mod-item">
+                    <div class="mod-name">Kotlin for Forge <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Support Kotlin</div>
+                    <div class="mod-author">by thedarkcolour</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/yungs-api" target="_blank" class="mod-item">
+                    <div class="mod-name">YUNG's API <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">API pour les mods YUNG</div>
+                    <div class="mod-author">by YUNGNICKYOUNG</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/caelus" target="_blank" class="mod-item">
+                    <div class="mod-name">Caelus API <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">API pour les élytres</div>
+                    <div class="mod-author">by TheIllusiveC4</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/playeranimator" target="_blank" class="mod-item">
+                    <div class="mod-name">playerAnimator <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Animations de joueur</div>
+                    <div class="mod-author">by KosmX</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/patchouli" target="_blank" class="mod-item">
+                    <div class="mod-name">Patchouli <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Livres de documentation</div>
+                    <div class="mod-author">by Vazkii</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/domum-ornamentum" target="_blank" class="mod-item">
+                    <div class="mod-name">Domum Ornamentum <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Pour MineColonies</div>
+                    <div class="mod-author">by ldtteam</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/structurize" target="_blank" class="mod-item">
+                    <div class="mod-name">Structurize <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Pour MineColonies</div>
+                    <div class="mod-author">by ldtteam</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/blockui" target="_blank" class="mod-item">
+                    <div class="mod-name">BlockUI <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Pour MineColonies</div>
+                    <div class="mod-author">by ldtteam</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/multi-piston" target="_blank" class="mod-item">
+                    <div class="mod-name">Multi-Piston <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Pour MineColonies</div>
+                    <div class="mod-author">by ldtteam</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- TRANSFORMATION & LYCANTHROPIE -->
+        <div class="category">
+            <h2><span class="icon">🐺</span>Transformation & Lycanthropie</h2>
+            <div class="mod-grid">
+                <a href="https://www.curseforge.com/minecraft/mc-mods/werewolves-become-a-beast" target="_blank" class="mod-item">
+                    <div class="mod-name">Werewolves - Become a Beast <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Système de lycanthropie complet avec progression et meute</div>
+                    <div class="mod-author">by Cheaterpaul</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/vampirism-become-a-vampire" target="_blank" class="mod-item">
+                    <div class="mod-name">Vampirism <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Vampires ennemis des loups-garous, guerre éternelle</div>
+                    <div class="mod-author">by Maxanier</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/origins-forge" target="_blank" class="mod-item">
+                    <div class="mod-name">Origins <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Système d'origines pour créer les rôles du jeu</div>
+                    <div class="mod-author">by Apace100</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- VILLAGES & PNJ -->
+        <div class="category">
+            <h2><span class="icon">🏘️</span>Villages & PNJ</h2>
+            <div class="mod-grid">
+                <a href="https://www.curseforge.com/minecraft/mc-mods/minecolonies" target="_blank" class="mod-item">
+                    <div class="mod-name">MineColonies <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Construisez et gérez votre propre village de Thiercelieux</div>
+                    <div class="mod-author">by ldtteam</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/guard-villagers" target="_blank" class="mod-item">
+                    <div class="mod-name">Guard Villagers <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Gardes du village protégeant contre les menaces nocturnes</div>
+                    <div class="mod-author">by almightytallestred</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/village-spawn-point" target="_blank" class="mod-item">
+                    <div class="mod-name">Village Spawn Point <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Commencez votre aventure dans un village</div>
+                    <div class="mod-author">by Serilum</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/villager-names" target="_blank" class="mod-item">
+                    <div class="mod-name">Villager Names <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Chaque villageois a un nom unique</div>
+                    <div class="mod-author">by Serilum</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/easy-villagers" target="_blank" class="mod-item">
+                    <div class="mod-name">Easy Villagers <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Gestion simplifiée des villageois</div>
+                    <div class="mod-author">by henkelmax</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- GÉNÉRATION DE MONDE -->
+        <div class="category">
+            <h2><span class="icon">🌲</span>Génération de Monde</h2>
+            <div class="mod-grid">
+                <a href="https://www.curseforge.com/minecraft/mc-mods/terralith" target="_blank" class="mod-item">
+                    <div class="mod-name">Terralith <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Biomes magnifiques : forêts sombres, montagnes brumeuses</div>
+                    <div class="mod-author">by Stardust Labs</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/tectonic" target="_blank" class="mod-item">
+                    <div class="mod-name">Tectonic <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Terrain réaliste avec montagnes imposantes</div>
+                    <div class="mod-author">by Apollo</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/yungs-better-villages-forge" target="_blank" class="mod-item">
+                    <div class="mod-name">YUNG's Better Villages <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Villages médiévaux magnifiquement générés</div>
+                    <div class="mod-author">by YUNGNICKYOUNG</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/yungs-better-dungeons-forge" target="_blank" class="mod-item">
+                    <div class="mod-name">YUNG's Better Dungeons <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Donjons terrifiants à explorer</div>
+                    <div class="mod-author">by YUNGNICKYOUNG</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/yungs-better-strongholds-forge" target="_blank" class="mod-item">
+                    <div class="mod-name">YUNG's Better Strongholds <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Forteresses massives et effrayantes</div>
+                    <div class="mod-author">by YUNGNICKYOUNG</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/yungs-better-mineshafts-forge" target="_blank" class="mod-item">
+                    <div class="mod-name">YUNG's Better Mineshafts <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Mines abandonnées améliorées</div>
+                    <div class="mod-author">by YUNGNICKYOUNG</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/yungs-better-ocean-monuments-forge" target="_blank" class="mod-item">
+                    <div class="mod-name">YUNG's Better Ocean Monuments <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Monuments océaniques retravaillés</div>
+                    <div class="mod-author">by YUNGNICKYOUNG</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/yungs-extras-forge" target="_blank" class="mod-item">
+                    <div class="mod-name">YUNG's Extras <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Structures supplémentaires</div>
+                    <div class="mod-author">by YUNGNICKYOUNG</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- AMBIANCE & IMMERSION -->
+        <div class="category">
+            <h2><span class="icon">🌙</span>Ambiance & Immersion</h2>
+            <div class="mod-grid">
+                <a href="https://www.curseforge.com/minecraft/mc-mods/serene-seasons" target="_blank" class="mod-item">
+                    <div class="mod-name">Serene Seasons <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Saisons dynamiques affectant l'atmosphère</div>
+                    <div class="mod-author">by TheAdubbz</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/ambientsounds" target="_blank" class="mod-item">
+                    <div class="mod-name">AmbientSounds <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Bruits de forêt, vent, animaux nocturnes</div>
+                    <div class="mod-author">by CreativeMD</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/sound-physics-remastered" target="_blank" class="mod-item">
+                    <div class="mod-name">Sound Physics Remastered <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Sons réalistes avec réverbération et écho</div>
+                    <div class="mod-author">by henkelmax</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/presence-footsteps-forge" target="_blank" class="mod-item">
+                    <div class="mod-name">Presence Footsteps <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Sons de pas réalistes selon le terrain</div>
+                    <div class="mod-author">by Sollace</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/simple-voice-chat" target="_blank" class="mod-item">
+                    <div class="mod-name">Simple Voice Chat <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Chat vocal proximité pour discussions nocturnes</div>
+                    <div class="mod-author">by henkelmax</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/dramatic-doors" target="_blank" class="mod-item">
+                    <div class="mod-name">Dramatic Doors <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Grandes portes imposantes de château</div>
+                    <div class="mod-author">by frikinjay</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/not-enough-animations" target="_blank" class="mod-item">
+                    <div class="mod-name">Not Enough Animations <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Animations de joueur améliorées</div>
+                    <div class="mod-author">by tr7zw</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/first-person-model" target="_blank" class="mod-item">
+                    <div class="mod-name">First Person Model <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Voir son corps en première personne</div>
+                    <div class="mod-author">by tr7zw</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- COMBAT & SURVIE -->
+        <div class="category">
+            <h2><span class="icon">⚔️</span>Combat & Survie</h2>
+            <div class="mod-grid">
+                <a href="https://www.curseforge.com/minecraft/mc-mods/better-combat-by-daedelus" target="_blank" class="mod-item">
+                    <div class="mod-name">Better Combat <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Système de combat amélioré</div>
+                    <div class="mod-author">by Daedelus</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/spartan-weaponry" target="_blank" class="mod-item">
+                    <div class="mod-name">Spartan Weaponry <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Armes médiévales : épées, haches, lances</div>
+                    <div class="mod-author">by ObliviousSpartan</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/spartan-shields" target="_blank" class="mod-item">
+                    <div class="mod-name">Spartan Shields <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Boucliers variés pour se défendre</div>
+                    <div class="mod-author">by ObliviousSpartan</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/tough-as-nails" target="_blank" class="mod-item">
+                    <div class="mod-name">Tough As Nails <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Soif et température pour la survie</div>
+                    <div class="mod-author">by TheAdubbz</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/first-aid" target="_blank" class="mod-item">
+                    <div class="mod-name">First Aid <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Système de santé réaliste par membre</div>
+                    <div class="mod-author">by ichttt</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/corpse" target="_blank" class="mod-item">
+                    <div class="mod-name">Corpse <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Corps restant après la mort</div>
+                    <div class="mod-author">by henkelmax</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/combat-roll" target="_blank" class="mod-item">
+                    <div class="mod-name">Combat Roll <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Roulade d'esquive en combat</div>
+                    <div class="mod-author">by Daedelus</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- GRAPHISMES & PERFORMANCE -->
+        <div class="category">
+            <h2><span class="icon">🎨</span>Graphismes & Performance</h2>
+            <div class="mod-grid">
+                <a href="https://www.curseforge.com/minecraft/mc-mods/embeddium" target="_blank" class="mod-item">
+                    <div class="mod-name">Embeddium <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Optimisation massive des performances (Sodium fork)</div>
+                    <div class="mod-author">by embeddedt</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/oculus" target="_blank" class="mod-item">
+                    <div class="mod-name">Oculus <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Support des shaders avec Embeddium</div>
+                    <div class="mod-author">by Asek3</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/distant-horizons" target="_blank" class="mod-item">
+                    <div class="mod-name">Distant Horizons <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Distance de vue massive pour voir au loin</div>
+                    <div class="mod-author">by jeseibel</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/entityculling" target="_blank" class="mod-item">
+                    <div class="mod-name">Entity Culling <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Optimisation du rendu des entités</div>
+                    <div class="mod-author">by tr7zw</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/entity-model-features" target="_blank" class="mod-item">
+                    <div class="mod-name">Entity Model Features <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Modèles d'entités améliorés</div>
+                    <div class="mod-author">by Traben</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/entity-texture-features-forge" target="_blank" class="mod-item">
+                    <div class="mod-name">Entity Texture Features <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Textures d'entités améliorées</div>
+                    <div class="mod-author">by Traben</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/ferritecore" target="_blank" class="mod-item">
+                    <div class="mod-name">FerriteCore <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Réduction utilisation mémoire</div>
+                    <div class="mod-author">by malte0811</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/modernfix" target="_blank" class="mod-item">
+                    <div class="mod-name">ModernFix <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Correctifs de performance modernes</div>
+                    <div class="mod-author">by embeddedt</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/immediatelyfast" target="_blank" class="mod-item">
+                    <div class="mod-name">ImmediatelyFast <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Optimisation du rendu immédiat</div>
+                    <div class="mod-author">by RaphiMC</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- CONSTRUCTION MÉDIÉVALE -->
+        <div class="category">
+            <h2><span class="icon">🏰</span>Construction Médiévale</h2>
+            <div class="mod-grid">
+                <a href="https://www.curseforge.com/minecraft/mc-mods/macaws-roofs" target="_blank" class="mod-item">
+                    <div class="mod-name">Macaw's Roofs <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Toits médiévaux variés</div>
+                    <div class="mod-author">by sketch_macaw</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/macaws-doors" target="_blank" class="mod-item">
+                    <div class="mod-name">Macaw's Doors <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Portes médiévales et rustiques</div>
+                    <div class="mod-author">by sketch_macaw</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/macaws-windows" target="_blank" class="mod-item">
+                    <div class="mod-name">Macaw's Windows <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Fenêtres de style médiéval</div>
+                    <div class="mod-author">by sketch_macaw</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/macaws-fences-and-walls" target="_blank" class="mod-item">
+                    <div class="mod-name">Macaw's Fences and Walls <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Clôtures et murs décoratifs</div>
+                    <div class="mod-author">by sketch_macaw</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/macaws-bridges" target="_blank" class="mod-item">
+                    <div class="mod-name">Macaw's Bridges <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Ponts médiévaux</div>
+                    <div class="mod-author">by sketch_macaw</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/macaws-furniture" target="_blank" class="mod-item">
+                    <div class="mod-name">Macaw's Furniture <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Meubles médiévaux</div>
+                    <div class="mod-author">by sketch_macaw</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/supplementaries" target="_blank" class="mod-item">
+                    <div class="mod-name">Supplementaries <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Décorations et objets utilitaires</div>
+                    <div class="mod-author">by MehVahdJukaar</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/decorative-blocks" target="_blank" class="mod-item">
+                    <div class="mod-name">Decorative Blocks <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Blocs décoratifs variés</div>
+                    <div class="mod-author">by stohun</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/create" target="_blank" class="mod-item">
+                    <div class="mod-name">Create <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Mécanismes médiévaux et moulins</div>
+                    <div class="mod-author">by simibubi</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/handcrafted" target="_blank" class="mod-item">
+                    <div class="mod-name">Handcrafted <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Meubles artisanaux</div>
+                    <div class="mod-author">by TeamAbnormals</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- QUALITÉ DE VIE -->
+        <div class="category">
+            <h2><span class="icon">🔧</span>Qualité de Vie</h2>
+            <div class="mod-grid">
+                <a href="https://www.curseforge.com/minecraft/mc-mods/jei" target="_blank" class="mod-item">
+                    <div class="mod-name">Just Enough Items (JEI) <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Voir toutes les recettes</div>
+                    <div class="mod-author">by mezz</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/journeymap" target="_blank" class="mod-item">
+                    <div class="mod-name">JourneyMap <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Carte du monde en temps réel</div>
+                    <div class="mod-author">by techbrew</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/jade" target="_blank" class="mod-item">
+                    <div class="mod-name">Jade <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Information sur les blocs regardés</div>
+                    <div class="mod-author">by Snownee</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/mouse-tweaks" target="_blank" class="mod-item">
+                    <div class="mod-name">Mouse Tweaks <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Gestion améliorée de l'inventaire</div>
+                    <div class="mod-author">by YaLTeR</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/appleskin" target="_blank" class="mod-item">
+                    <div class="mod-name">AppleSkin <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Visualisation faim et saturation</div>
+                    <div class="mod-author">by squeek502</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap" target="_blank" class="mod-item">
+                    <div class="mod-name">Xaero's Minimap <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Minimap en jeu</div>
+                    <div class="mod-author">by xaero96</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/inventory-sorter" target="_blank" class="mod-item">
+                    <div class="mod-name">Inventory Sorter <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Tri automatique de l'inventaire</div>
+                    <div class="mod-author">by cpw</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/controlling" target="_blank" class="mod-item">
+                    <div class="mod-name">Controlling <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Recherche de raccourcis clavier</div>
+                    <div class="mod-author">by Jaredlll08</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/configured" target="_blank" class="mod-item">
+                    <div class="mod-name">Configured <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Configuration des mods en jeu</div>
+                    <div class="mod-author">by MrCrayfish</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/ftb-chunks-forge" target="_blank" class="mod-item">
+                    <div class="mod-name">FTB Chunks <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Claim et protection de chunks</div>
+                    <div class="mod-author">by FTB</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/ftb-teams-forge" target="_blank" class="mod-item">
+                    <div class="mod-name">FTB Teams <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Système d'équipes</div>
+                    <div class="mod-author">by FTB</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/ftb-library-forge" target="_blank" class="mod-item">
+                    <div class="mod-name">FTB Library <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Bibliothèque FTB</div>
+                    <div class="mod-author">by FTB</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/mc-mods/carry-on" target="_blank" class="mod-item">
+                    <div class="mod-name">Carry On <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Porter des blocs et entités</div>
+                    <div class="mod-author">by Tschipp</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- SHADERS -->
+        <div class="category">
+            <h2><span class="icon">✨</span>Shaders Recommandés (Optionnels)</h2>
+            <div class="mod-grid">
+                <a href="https://modrinth.com/shader/complementary-reimagined" target="_blank" class="mod-item">
+                    <div class="mod-name">Complementary Reimagined <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Shaders magnifiques pour l'ambiance nocturne</div>
+                    <div class="mod-author">by EminGT</div>
+                </a>
+                <a href="https://modrinth.com/shader/bsl-shaders" target="_blank" class="mod-item">
+                    <div class="mod-name">BSL Shaders <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Shaders légers et beaux</div>
+                    <div class="mod-author">by CaptTatsu</div>
+                </a>
+                <a href="https://www.curseforge.com/minecraft/shaders/sildurs-vibrant-shaders" target="_blank" class="mod-item">
+                    <div class="mod-name">Sildur's Vibrant Shaders <span class="download-icon">⬇️</span></div>
+                    <div class="mod-desc">Shaders vibrants et colorés</div>
+                    <div class="mod-author">by Sildur</div>
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            <p>🐺 LA MEUTE - Modpack Loup-Garou 🌕</p>
+            <p>Minecraft 1.20.1 • Forge 47.2.0</p>
+            <p style="margin-top: 15px; font-style: italic;">"Quand la pleine lune se lève, la meute s'éveille..."</p>
+            <p class="credits">Développé par w9n0</p>
+        </footer>
+    </div>
+</body>
+</html>

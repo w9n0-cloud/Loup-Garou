@@ -1,0 +1,32 @@
+# Configuration MineColonies - La Meute
+# ======================================
+
+[gameplay]
+    # Style de construction médiéval par défaut
+    defaultStyle = "medieval_oak"
+    
+    # Attaques nocturnes plus fréquentes
+    enableRaidsAtNight = true
+    raidDifficulty = 2
+    
+    # Gardes plus vigilants la nuit
+    guardNightVigilance = true
+
+[citizens]
+    # Citoyens ont peur la nuit
+    citizensFearNight = true
+    
+    # Couvre-feu automatique
+    enableCurfew = true
+    curfewStartTime = 18000
+    curfewEndTime = 6000
+    
+    # Noms de villageois médiévaux
+    useHistoricalNames = true
+
+[buildings]
+    # Priorité aux bâtiments défensifs
+    prioritizeDefense = true
+    
+    # Tours de garde obligatoires
+    requireWatchtowers = true

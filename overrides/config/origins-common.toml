@@ -1,0 +1,29 @@
+# Configuration Origins - Rôles du Loup-Garou
+# ============================================
+# Ce fichier configure les origines personnalisées
+# pour recréer les rôles du jeu Loup-Garou
+
+[general]
+    # Permettre le choix d'origine au spawn
+    allowOriginChange = false
+    
+    # Origines disponibles
+    enabledOrigins = [
+        "lameute:villageois",
+        "lameute:loup_garou", 
+        "lameute:voyante",
+        "lameute:sorciere",
+        "lameute:chasseur",
+        "lameute:cupidon",
+        "lameute:salvateur",
+        "lameute:petite_fille",
+        "lameute:ancien",
+        "lameute:idiot_du_village"
+    ]
+
+[powers]
+    # Cooldowns des pouvoirs (en secondes)
+    voyanteCooldown = 300
+    sorcierePotionCooldown = 600
+    salvateurProtectionCooldown = 1200
+    cupidonLinkCooldown = 99999

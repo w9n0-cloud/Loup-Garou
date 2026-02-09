@@ -1,0 +1,36 @@
+{
+    "name": "La Meute - Loup-Garou",
+    "summary": "Modpack immersif basé sur le jeu Loup-Garou de Thiercelieux. Transformez-vous en loup-garou sous la pleine lune, construisez des villages médiévaux, et vivez des nuits terrifiantes dans une ambiance sombre et mystérieuse.",
+    "versionId": "1.0.0",
+    "formatVersion": 1,
+    "minecraftVersion": "1.20.1",
+    "modLoader": "forge",
+    "modLoaderVersion": "47.2.0",
+    "dependencies": {
+        "forge": ">=47.2.0"
+    },
+    "files": {
+        "overrides": "./overrides"
+    },
+    "authors": [
+        "w9n0"
+    ],
+    "description": [
+        "🐺 LA MEUTE - Modpack Loup-Garou 🌕",
+        "",
+        "Vivez l'expérience ultime du Loup-Garou dans Minecraft !",
+        "",
+        "✨ Fonctionnalités :",
+        "• Transformation en loup-garou sous la pleine lune",
+        "• Villages médiévaux avec PNJ vivants",
+        "• Cycle lunaire dynamique",
+        "• Système de rôles complet (Voyante, Sorcière, Chasseur...)",
+        "• Ambiance sonore et visuelle immersive",
+        "• Combat amélioré avec armes en argent",
+        "",
+        "🎮 Parfait pour 8-16 joueurs",
+        "📦 65+ mods soigneusement sélectionnés",
+        "",
+        "Que la chasse commence !"
+    ]
+}

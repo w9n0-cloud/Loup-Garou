@@ -1,0 +1,8 @@
+# Configuration Forge - La Meute
+[splashscreen]
+    # Écran de chargement sombre
+    background = 0x1a1a2e
+    fontColor = 0xff6b35
+    barBackground = 0x16213e
+    barColor = 0xffd700
+    barBorder = 0xff6b35
