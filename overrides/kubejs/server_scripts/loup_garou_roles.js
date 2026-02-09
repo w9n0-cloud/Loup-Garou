@@ -53,6 +53,53 @@ function updatePlayerDisplayName(player) {
 }
 
 // ============================================
+// 📍 SYSTÈME D'ARÈNE ET TÉLÉPORTATION
+// ============================================
+
+// Position de l'arène (centre du cercle)
+let arenaCenter = {
+    x: 0,
+    y: 100,
+    z: 0,
+    set: false,
+    radius: 5  // Rayon du cercle en blocs
+};
+
+// Fonction pour TP tous les joueurs en cercle autour du centre
+function teleportPlayersInCircle(server) {
+    let players = [];
+    server.players.forEach(p => {
+        if (p.hasTag('loupgarou_playing')) {
+            players.push(p);
+        }
+    });
+    
+    if (players.length === 0) {
+        server.players.forEach(p => players.push(p));
+    }
+    
+    const count = players.length;
+    const angleStep = (2 * Math.PI) / count;
+    
+    players.forEach((player, index) => {
+        const angle = angleStep * index;
+        const x = arenaCenter.x + Math.cos(angle) * arenaCenter.radius;
+        const z = arenaCenter.z + Math.sin(angle) * arenaCenter.radius;
+        const y = arenaCenter.y;
+        
+        // TP le joueur
+        player.server.runCommandSilent('tp ' + player.name.string + ' ' + x.toFixed(1) + ' ' + y + ' ' + z.toFixed(1));
+        
+        // Faire regarder le joueur vers le centre
+        const lookX = arenaCenter.x;
+        const lookZ = arenaCenter.z;
+        player.server.runCommandSilent('tp ' + player.name.string + ' ' + x.toFixed(1) + ' ' + y + ' ' + z.toFixed(1) + ' facing ' + lookX + ' ' + y + ' ' + lookZ);
+    });
+    
+    return count;
+}
+
+// ============================================
 // ⏰ SYSTÈME DE TIMER AUTOMATIQUE (XP BAR)
 // ============================================
 
@@ -1064,9 +1111,13 @@ PlayerEvents.tick(event => {
 ServerEvents.commandRegistry(event => {
     const { commands: Commands, arguments: Arguments } = event;
     
+    // Fonction pour vérifier si le joueur est OP (niveau 2+)
+    const requiresOP = (source) => source.hasPermission(2);
+    
     // Commande pour démarrer une partie avec distribution automatique
     event.register(
         Commands.literal('lameute')
+            .requires(requiresOP)
             .then(Commands.literal('start')
                 .then(Commands.argument('loups', Arguments.INTEGER.create(event))
                     .executes(ctx => {
@@ -1264,9 +1315,71 @@ ServerEvents.commandRegistry(event => {
             )
     );
     
+    // Commandes d'arène
+    event.register(
+        Commands.literal('lameute')
+            .requires(requiresOP)
+            .then(Commands.literal('arene')
+                .then(Commands.literal('set')
+                    .executes(ctx => {
+                        const player = ctx.source.player;
+                        arenaCenter.x = Math.floor(player.x);
+                        arenaCenter.y = Math.floor(player.y);
+                        arenaCenter.z = Math.floor(player.z);
+                        arenaCenter.set = true;
+                        
+                        player.tell('§a[Arène] §7Centre défini à §e' + arenaCenter.x + ' ' + arenaCenter.y + ' ' + arenaCenter.z);
+                        player.tell('§7Utilisez §e/lameute arene rayon <nombre> §7pour modifier le rayon (défaut: 5)');
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('rayon')
+                    .then(Commands.argument('size', Arguments.INTEGER.create(event))
+                        .executes(ctx => {
+                            const size = Arguments.INTEGER.getResult(ctx, 'size');
+                            arenaCenter.radius = Math.max(2, Math.min(size, 20));
+                            ctx.source.player.tell('§a[Arène] §7Rayon du cercle : §e' + arenaCenter.radius + ' blocs');
+                            return 1;
+                        })
+                    )
+                )
+                .then(Commands.literal('tp')
+                    .executes(ctx => {
+                        if (!arenaCenter.set) {
+                            ctx.source.player.tell('§c[Arène] §7Aucune arène définie ! Utilisez §e/lameute arene set');
+                            return 0;
+                        }
+                        
+                        const count = teleportPlayersInCircle(ctx.source.server);
+                        
+                        ctx.source.level.players.forEach(p => {
+                            p.tell('§a[Arène] §7Téléportation en cercle ! §e' + count + ' joueurs');
+                            p.level.playSound(null, p.blockPosition(), 
+                                'minecraft:entity.enderman.teleport', 'players', 1.0, 1.0);
+                        });
+                        
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('info')
+                    .executes(ctx => {
+                        if (!arenaCenter.set) {
+                            ctx.source.player.tell('§c[Arène] §7Aucune arène définie !');
+                            return 0;
+                        }
+                        ctx.source.player.tell('§6§l=== ARÈNE ===');
+                        ctx.source.player.tell('§7Centre : §e' + arenaCenter.x + ' ' + arenaCenter.y + ' ' + arenaCenter.z);
+                        ctx.source.player.tell('§7Rayon : §e' + arenaCenter.radius + ' blocs');
+                        return 1;
+                    })
+                )
+            )
+    );
+    
     // Commande pour assigner un rôle manuellement
     event.register(
         Commands.literal('lameute')
+            .requires(requiresOP)
             .then(Commands.literal('role')
                 .then(Commands.argument('player', Arguments.PLAYER.create(event))
                     .then(Commands.argument('role', Arguments.STRING.create(event))

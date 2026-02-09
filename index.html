@@ -18,7 +18,7 @@
             padding: 40px 20px;
         }
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         header {
@@ -44,108 +44,207 @@
             margin-top: 15px;
             font-weight: bold;
         }
-        .category {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .category h2 {
-            color: #ffd700;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
-        }
-        .category.essential {
-            border: 2px solid #ff6b35;
-            background: rgba(255, 107, 53, 0.1);
-        }
-        .category.essential h2 {
-            color: #ff6b35;
-        }
-        .mod-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-        }
-        .mod-item {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid #ff6b35;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
-            color: inherit;
-        }
-        .mod-item:hover {
-            transform: translateX(5px) scale(1.02);
-            background: rgba(255, 107, 53, 0.2);
-            box-shadow: 0 5px 25px rgba(255, 107, 53, 0.4);
-        }
-        .mod-item:hover .mod-name {
-            color: #ffd700;
-        }
-        .mod-item:hover .download-icon {
-            opacity: 1;
-        }
-        .mod-name {
-            font-weight: bold;
-            color: #ffffff;
-            font-size: 1.1em;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .download-icon {
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-        .mod-desc {
-            color: #b0b0b0;
-            font-size: 0.9em;
-        }
-        .required-tag {
-            background: #ff6b35;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.7em;
-            margin-left: 10px;
-        }
-        .optional-tag {
-            background: #4a90d9;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.7em;
-            margin-left: 10px;
-        }
-        .info-box {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        .info-box h3 {
-            color: #ffd700;
-            margin-bottom: 10px;
-        }
-        .info-box ul {
-            margin-left: 20px;
-        }
-        .info-box li {
-            margin: 5px 0;
-        }
         .moon {
             font-size: 4em;
             margin-bottom: 20px;
         }
+        
+        /* Download Section */
+        .download-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .download-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .download-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(255, 107, 53, 0.3);
+            border-color: #ff6b35;
+        }
+        .download-card.client {
+            border-color: #4a90d9;
+        }
+        .download-card.client:hover {
+            box-shadow: 0 10px 40px rgba(74, 144, 217, 0.3);
+            border-color: #4a90d9;
+        }
+        .download-card.server {
+            border-color: #67b26f;
+        }
+        .download-card.server:hover {
+            box-shadow: 0 10px 40px rgba(103, 178, 111, 0.3);
+            border-color: #67b26f;
+        }
+        .download-card h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        .download-card.client h3 {
+            color: #4a90d9;
+        }
+        .download-card.server h3 {
+            color: #67b26f;
+        }
+        .download-card p {
+            color: #a0a0a0;
+            margin-bottom: 20px;
+        }
+        .download-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .download-btn.client {
+            background: linear-gradient(45deg, #4a90d9, #357abd);
+            color: white;
+        }
+        .download-btn.server {
+            background: linear-gradient(45deg, #67b26f, #4a9c52);
+            color: white;
+        }
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        .download-size {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        /* Features Section */
+        .features {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        .features h2 {
+            color: #ffd700;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .feature-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid #ff6b35;
+        }
+        .feature-item h4 {
+            color: #ff6b35;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        .feature-item p {
+            color: #b0b0b0;
+            font-size: 0.95em;
+        }
+
+        /* Commands Section */
+        .commands {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        .commands h2 {
+            color: #ff6b35;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .command-list {
+            display: grid;
+            gap: 10px;
+        }
+        .command-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 15px;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .command-item code {
+            background: #1a1a2e;
+            padding: 5px 12px;
+            border-radius: 5px;
+            color: #ffd700;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+        .command-item span {
+            color: #b0b0b0;
+        }
+
+        /* Roles Section */
+        .roles {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        .roles h2 {
+            color: #c41e3a;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .role-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .role-item.loup {
+            border: 2px solid #c41e3a;
+        }
+        .role-item.village {
+            border: 2px solid #4a90d9;
+        }
+        .role-item.special {
+            border: 2px solid #9b59b6;
+        }
+        .role-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .role-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .role-item.loup .role-name { color: #c41e3a; }
+        .role-item.village .role-name { color: #4a90d9; }
+        .role-item.special .role-name { color: #9b59b6; }
+        .role-desc {
+            font-size: 0.85em;
+            color: #888;
+        }
+
         footer {
             text-align: center;
             margin-top: 50px;
@@ -157,29 +256,7 @@
             margin-top: 20px;
             color: #ff6b35;
             font-weight: bold;
-        }
-        .step-number {
-            background: #ff6b35;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 10px;
-            font-weight: bold;
-        }
-        .install-steps {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        .install-steps p {
-            margin: 15px 0;
-            padding-left: 40px;
-            position: relative;
+            font-size: 1.2em;
         }
     </style>
 </head>
@@ -192,130 +269,147 @@
             <span class="version-badge">Minecraft 1.20.1 • Forge 47.2.0</span>
         </header>
 
-        <div class="info-box">
-            <h3>📋 Comment installer ?</h3>
-            <div class="install-steps">
-                <p><span class="step-number">1</span> Crée un profil <strong>Forge 1.20.1</strong> dans CurseForge</p>
-                <p><span class="step-number">2</span> Installe les <strong>3 mods obligatoires</strong> ci-dessous</p>
-                <p><span class="step-number">3</span> Copie le dossier <strong>kubejs</strong> dans ton profil</p>
-                <p><span class="step-number">4</span> Lance le jeu et utilise <strong>/lameute start 2</strong></p>
+        <!-- Download Section -->
+        <div class="download-section">
+            <div class="download-card client">
+                <h3>🎮 Client</h3>
+                <p>Pour jouer sur le serveur.<br>Contient tous les mods et scripts.</p>
+                <a href="LaMeute-Client.zip" class="download-btn client" download>
+                    ⬇️ Télécharger Client
+                </a>
+                <span class="download-size">~50 MB • Prêt à jouer</span>
+            </div>
+            <div class="download-card server">
+                <h3>🖥️ Serveur</h3>
+                <p>Pour héberger une partie.<br>Mods + Scripts + Instructions.</p>
+                <a href="LaMeute-Server.zip" class="download-btn server" download>
+                    ⬇️ Télécharger Serveur
+                </a>
+                <span class="download-size">~34 MB • Forge 1.20.1</span>
             </div>
         </div>
 
-        <!-- MODS OBLIGATOIRES -->
-        <div class="category essential">
-            <h2>🔴 MODS OBLIGATOIRES (Le jeu marche PAS sans)</h2>
-            <div class="mod-grid">
-                <a href="https://www.curseforge.com/minecraft/mc-mods/kubejs" target="_blank" class="mod-item">
-                    <div class="mod-name">KubeJS <span class="required-tag">REQUIS</span> <span class="download-icon">⬇️</span></div>
-                    <div class="mod-desc">Les scripts du jeu Loup-Garou (rôles, votes, timer)</div>
-                </a>
-                <a href="https://www.curseforge.com/minecraft/mc-mods/rhino" target="_blank" class="mod-item">
-                    <div class="mod-name">Rhino <span class="required-tag">REQUIS</span> <span class="download-icon">⬇️</span></div>
-                    <div class="mod-desc">Moteur JavaScript pour KubeJS</div>
-                </a>
-                <a href="https://www.curseforge.com/minecraft/mc-mods/architectury-api" target="_blank" class="mod-item">
-                    <div class="mod-name">Architectury API <span class="required-tag">REQUIS</span> <span class="download-icon">⬇️</span></div>
-                    <div class="mod-desc">Bibliothèque requise par KubeJS</div>
-                </a>
+        <!-- Features Section -->
+        <div class="features">
+            <h2>✨ Fonctionnalités</h2>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h4>🎴 Distribution automatique</h4>
+                    <p>Les rôles sont distribués secrètement à chaque joueur avec une animation dramatique.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>⏱️ Timer automatique</h4>
+                    <p>Jour/Nuit automatique avec barre d'XP. Configurable (3, 5 ou 7 minutes).</p>
+                </div>
+                <div class="feature-item">
+                    <h4>🗳️ Vote par clic</h4>
+                    <p>Clic droit sur un joueur pour voter, clic gauche pour annuler.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>🌙 Nuit immersive</h4>
+                    <p>Effet d'aveuglement la nuit. Les loups voient et se retrouvent.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>📍 Système d'arène</h4>
+                    <p>TP automatique de tous les joueurs en cercle face au centre.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>🏷️ Titres personnalisés</h4>
+                    <p>Ajoutez des titres aux joueurs visibles dans le TAB et le chat.</p>
+                </div>
             </div>
         </div>
 
-        <!-- MODS RECOMMANDÉS -->
-        <div class="category">
-            <h2>🟡 MODS RECOMMANDÉS (Pour l'expérience complète)</h2>
-            <div class="mod-grid">
-                <a href="https://www.curseforge.com/minecraft/mc-mods/simple-voice-chat" target="_blank" class="mod-item">
-                    <div class="mod-name">Simple Voice Chat <span class="optional-tag">VOCAL</span> <span class="download-icon">⬇️</span></div>
-                    <div class="mod-desc">Chat vocal proximité - Parle avec les joueurs proches</div>
-                </a>
-                <a href="https://www.curseforge.com/minecraft/mc-mods/journeymap" target="_blank" class="mod-item">
-                    <div class="mod-name">JourneyMap <span class="optional-tag">MAP</span> <span class="download-icon">⬇️</span></div>
-                    <div class="mod-desc">Carte du monde en temps réel</div>
-                </a>
-                <a href="https://www.curseforge.com/minecraft/mc-mods/jade" target="_blank" class="mod-item">
-                    <div class="mod-name">Jade <span class="optional-tag">INFO</span> <span class="download-icon">⬇️</span></div>
-                    <div class="mod-desc">Voir le nom des joueurs et blocs</div>
-                </a>
+        <!-- Commands Section -->
+        <div class="commands">
+            <h2>⌨️ Commandes (OP uniquement)</h2>
+            <div class="command-list">
+                <div class="command-item">
+                    <code>/lameute start &lt;loups&gt;</code>
+                    <span>Démarrer une partie avec X loups-garous</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute timer auto</code>
+                    <span>Activer le timer automatique jour/nuit</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute timer jour &lt;3/5/7&gt;</code>
+                    <span>Définir la durée du jour en minutes</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute arene set</code>
+                    <span>Définir le centre de l'arène (ta position)</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute arene rayon &lt;2-20&gt;</code>
+                    <span>Modifier le rayon du cercle</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute arene tp</code>
+                    <span>TP tous les joueurs en cercle</span>
+                </div>
+                <div class="command-item">
+                    <code>/tab &lt;joueur&gt; &lt;titre&gt;</code>
+                    <span>Donner un titre à un joueur</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute roles</code>
+                    <span>Voir la liste des rôles disponibles</span>
+                </div>
             </div>
         </div>
 
-        <!-- MODS PERFORMANCE -->
-        <div class="category">
-            <h2>⚡ PERFORMANCE (Si ton PC rame)</h2>
-            <div class="mod-grid">
-                <a href="https://www.curseforge.com/minecraft/mc-mods/embeddium" target="_blank" class="mod-item">
-                    <div class="mod-name">Embeddium <span class="download-icon">⬇️</span></div>
-                    <div class="mod-desc">Boost les FPS (comme Optifine)</div>
-                </a>
-                <a href="https://www.curseforge.com/minecraft/mc-mods/ferritecore" target="_blank" class="mod-item">
-                    <div class="mod-name">FerriteCore <span class="download-icon">⬇️</span></div>
-                    <div class="mod-desc">Réduit l'utilisation de RAM</div>
-                </a>
-                <a href="https://www.curseforge.com/minecraft/mc-mods/modernfix" target="_blank" class="mod-item">
-                    <div class="mod-name">ModernFix <span class="download-icon">⬇️</span></div>
-                    <div class="mod-desc">Optimisations diverses</div>
-                </a>
-            </div>
-        </div>
-
-        <!-- COMMANDES -->
-        <div class="category">
-            <h2>🎮 COMMANDES DU JEU</h2>
-            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; font-family: monospace;">
-                <p style="margin: 10px 0;"><strong style="color: #ffd700;">/lameute start 2</strong> → Lance une partie (2 = nombre de loups)</p>
-                <p style="margin: 10px 0;"><strong style="color: #ffd700;">/lameute timer auto</strong> → Active le timer jour/nuit automatique</p>
-                <p style="margin: 10px 0;"><strong style="color: #ffd700;">/lameute roles</strong> → Voir tous les rôles (MJ seulement)</p>
-                <p style="margin: 10px 0;"><strong style="color: #ffd700;">/tab Joueur Dev</strong> → Donner un titre à un joueur</p>
-            </div>
-        </div>
-
-        <!-- RÔLES -->
-        <div class="category">
-            <h2>🎭 RÔLES DISPONIBLES</h2>
-            <div class="mod-grid">
-                <div class="mod-item" style="cursor: default; border-left-color: #c0392b;">
-                    <div class="mod-name" style="color: #c0392b;">🐺 Loup-Garou</div>
-                    <div class="mod-desc">Vote la nuit pour dévorer un villageois (clic droit avec os)</div>
+        <!-- Roles Section -->
+        <div class="roles">
+            <h2>🎭 Rôles disponibles</h2>
+            <div class="role-grid">
+                <div class="role-item loup">
+                    <div class="role-icon">🐺</div>
+                    <div class="role-name">Loup-Garou</div>
+                    <div class="role-desc">Dévore un villageois chaque nuit</div>
                 </div>
-                <div class="mod-item" style="cursor: default; border-left-color: #27ae60;">
-                    <div class="mod-name" style="color: #27ae60;">🏠 Villageois</div>
-                    <div class="mod-desc">Vote le jour pour éliminer les suspects</div>
+                <div class="role-item village">
+                    <div class="role-icon">👨‍🌾</div>
+                    <div class="role-name">Villageois</div>
+                    <div class="role-desc">Doit éliminer les loups</div>
                 </div>
-                <div class="mod-item" style="cursor: default; border-left-color: #3498db;">
-                    <div class="mod-name" style="color: #3498db;">👁 Voyante</div>
-                    <div class="mod-desc">Découvre le rôle d'un joueur (clic droit avec œil d'araignée)</div>
+                <div class="role-item special">
+                    <div class="role-icon">🔮</div>
+                    <div class="role-name">Voyante</div>
+                    <div class="role-desc">Voit le rôle d'un joueur</div>
                 </div>
-                <div class="mod-item" style="cursor: default; border-left-color: #9b59b6;">
-                    <div class="mod-name" style="color: #9b59b6;">⚗ Sorcière</div>
-                    <div class="mod-desc">Potion de vie (pomme dorée) ou de mort (rose wither)</div>
+                <div class="role-item special">
+                    <div class="role-icon">🧪</div>
+                    <div class="role-name">Sorcière</div>
+                    <div class="role-desc">Potions de vie et de mort</div>
                 </div>
-                <div class="mod-item" style="cursor: default; border-left-color: #e67e22;">
-                    <div class="mod-name" style="color: #e67e22;">🏹 Chasseur</div>
-                    <div class="mod-desc">Tire sur quelqu'un en mourant (arc)</div>
+                <div class="role-item special">
+                    <div class="role-icon">🏹</div>
+                    <div class="role-name">Chasseur</div>
+                    <div class="role-desc">Tire sur quelqu'un en mourant</div>
                 </div>
-                <div class="mod-item" style="cursor: default; border-left-color: #f1c40f;">
-                    <div class="mod-name" style="color: #f1c40f;">💕 Cupidon</div>
-                    <div class="mod-desc">Lie deux joueurs par l'amour (coquelicot)</div>
+                <div class="role-item special">
+                    <div class="role-icon">💘</div>
+                    <div class="role-name">Cupidon</div>
+                    <div class="role-desc">Lie deux amoureux</div>
                 </div>
-                <div class="mod-item" style="cursor: default; border-left-color: #ecf0f1;">
-                    <div class="mod-name" style="color: #ecf0f1;">🛡 Salvateur</div>
-                    <div class="mod-desc">Protège un joueur la nuit (bouclier)</div>
+                <div class="role-item special">
+                    <div class="role-icon">🛡️</div>
+                    <div class="role-name">Salvateur</div>
+                    <div class="role-desc">Protège un joueur la nuit</div>
                 </div>
-                <div class="mod-item" style="cursor: default; border-left-color: #f39c12;">
-                    <div class="mod-name" style="color: #f39c12;">👀 Petite Fille</div>
-                    <div class="mod-desc">Peut espionner les loups la nuit</div>
+                <div class="role-item special">
+                    <div class="role-icon">👧</div>
+                    <div class="role-name">Petite Fille</div>
+                    <div class="role-desc">Peut espionner les loups</div>
                 </div>
             </div>
         </div>
 
         <footer>
-            <p>🐺 LA MEUTE - Loup-Garou Minecraft 🌕</p>
-            <p style="margin-top: 10px; font-style: italic;">"Quand la pleine lune se lève, la meute s'éveille..."</p>
-            <p class="credits">Développé par w9n0</p>
-            <p style="margin-top: 15px;">
-                <a href="https://github.com/w9n0-cloud/Loup-Garou" target="_blank" style="color: #4a90d9;">📦 GitHub Repository</a>
-            </p>
+            <p>Modpack inspiré des vidéos de Squeezie</p>
+            <p>Minecraft 1.20.1 • Forge 47.2.0 • KubeJS</p>
+            <p class="credits">🐺 Développé par w9n0 🐺</p>
         </footer>
     </div>
 </body>
