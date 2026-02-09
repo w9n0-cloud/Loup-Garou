@@ -4,434 +4,922 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🐺 La Meute - Loup-Garou Minecraft</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
-            color: #e0e0e0;
-            min-height: 100vh;
-            padding: 40px 20px;
+
+        :root {
+            --primary: #ff6b35;
+            --secondary: #ffd700;
+            --dark: #0a0a0f;
+            --darker: #050508;
+            --light: #ffffff;
+            --gray: #8892b0;
+            --blue: #4a90d9;
+            --green: #67b26f;
+            --orange: #e67e22;
+            --red: #c41e3a;
+            --purple: #9b59b6;
         }
-        .container {
-            max-width: 1000px;
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--darker);
+            color: var(--light);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(10, 10, 15, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5em;
+            font-weight: 900;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--light);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 20px 80px;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            z-index: 1;
+        }
+
+        .moon-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .moon {
+            font-size: 8em;
+            animation: float 6s ease-in-out infinite;
+            filter: drop-shadow(0 0 60px rgba(255, 215, 0, 0.4));
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .wolf-silhouette {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3em;
+            animation: howl 4s ease-in-out infinite;
+        }
+
+        @keyframes howl {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 5em;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--primary) 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shine 3s linear infinite;
+            text-shadow: 0 0 80px rgba(255, 107, 53, 0.5);
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        .tagline {
+            font-size: 1.5em;
+            color: var(--gray);
+            margin-bottom: 15px;
+            font-weight: 300;
+        }
+
+        .version {
+            display: inline-flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .version span {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            color: var(--gray);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-indicator span {
+            display: block;
+            width: 30px;
+            height: 50px;
+            border: 2px solid var(--gray);
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .scroll-indicator span::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 3px;
+            animation: scroll 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        @keyframes scroll {
+            0% { opacity: 1; top: 8px; }
+            100% { opacity: 0; top: 30px; }
+        }
+
+        /* Section Styling */
+        section {
+            padding: 100px 20px;
+            max-width: 1400px;
             margin: 0 auto;
         }
-        header {
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 3em;
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 60px;
+            position: relative;
         }
-        h1 {
-            font-size: 3.5em;
-            color: #ff6b35;
-            text-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
-            margin-bottom: 10px;
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
         }
-        .subtitle {
-            font-size: 1.3em;
-            color: #a0a0a0;
-            font-style: italic;
+
+        /* Download Section */
+        #download {
+            background: linear-gradient(180deg, transparent, rgba(255, 107, 53, 0.03), transparent);
         }
-        .version-badge {
-            display: inline-block;
-            background: linear-gradient(45deg, #4a90d9, #67b26f);
-            padding: 8px 20px;
-            border-radius: 25px;
-            margin-top: 15px;
-            font-weight: bold;
+
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
         }
-        .moon {
+
+        .download-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .download-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.02));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .download-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(255, 107, 53, 0.1);
+        }
+
+        .download-card:hover::before {
+            opacity: 1;
+        }
+
+        .download-card.client { --card-color: var(--blue); }
+        .download-card.server { --card-color: var(--green); }
+        .download-card.map { --card-color: var(--orange); }
+
+        .download-card:hover {
+            border-color: var(--card-color);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px color-mix(in srgb, var(--card-color) 30%, transparent);
+        }
+
+        .card-icon {
             font-size: 4em;
             margin-bottom: 20px;
+            display: block;
         }
-        
-        /* Download Section */
-        .download-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-        .download-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-        .download-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 40px rgba(255, 107, 53, 0.3);
-            border-color: #ff6b35;
-        }
-        .download-card.client {
-            border-color: #4a90d9;
-        }
-        .download-card.client:hover {
-            box-shadow: 0 10px 40px rgba(74, 144, 217, 0.3);
-            border-color: #4a90d9;
-        }
-        .download-card.server {
-            border-color: #67b26f;
-        }
-        .download-card.server:hover {
-            box-shadow: 0 10px 40px rgba(103, 178, 111, 0.3);
-            border-color: #67b26f;
-        }
-        .download-card.map {
-            border-color: #e67e22;
-        }
-        .download-card.map:hover {
-            box-shadow: 0 10px 40px rgba(230, 126, 34, 0.3);
-            border-color: #e67e22;
-        }
+
         .download-card h3 {
+            font-family: 'Cinzel', serif;
             font-size: 1.8em;
             margin-bottom: 15px;
+            color: var(--card-color);
         }
-        .download-card.client h3 {
-            color: #4a90d9;
-        }
-        .download-card.server h3 {
-            color: #67b26f;
-        }
-        .download-card.map h3 {
-            color: #e67e22;
-        }
+
         .download-card p {
-            color: #a0a0a0;
-            margin-bottom: 20px;
+            color: var(--gray);
+            margin-bottom: 25px;
+            line-height: 1.6;
         }
+
         .download-btn {
-            display: inline-block;
-            padding: 15px 40px;
-            border-radius: 30px;
-            font-size: 1.1em;
-            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 600;
             text-decoration: none;
+            color: white;
+            background: linear-gradient(135deg, var(--card-color), color-mix(in srgb, var(--card-color) 70%, black));
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .download-btn.client {
-            background: linear-gradient(45deg, #4a90d9, #357abd);
-            color: white;
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
         }
-        .download-btn.server {
-            background: linear-gradient(45deg, #67b26f, #4a9c52);
-            color: white;
+
+        .download-btn:hover::before {
+            left: 100%;
         }
-        .download-btn.map {
-            background: linear-gradient(45deg, #e67e22, #d35400);
-            color: white;
-        }
+
         .download-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px color-mix(in srgb, var(--card-color) 40%, transparent);
         }
+
         .download-size {
             display: block;
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #888;
+            margin-top: 15px;
+            font-size: 0.85em;
+            color: var(--gray);
         }
 
         /* Features Section */
-        .features {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 40px;
+        #features {
+            background: linear-gradient(180deg, transparent, rgba(255, 215, 0, 0.02), transparent);
         }
-        .features h2 {
-            color: #ffd700;
-            font-size: 1.8em;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-        .feature-grid {
+
+        .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
         }
-        .feature-item {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 15px;
-            border-left: 4px solid #ff6b35;
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 35px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .feature-item h4 {
-            color: #ff6b35;
-            margin-bottom: 10px;
-            font-size: 1.2em;
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            transition: height 0.3s ease;
         }
-        .feature-item p {
-            color: #b0b0b0;
-            font-size: 0.95em;
+
+        .feature-card:hover {
+            transform: translateX(10px);
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 107, 53, 0.3);
+        }
+
+        .feature-card:hover::before {
+            height: 100%;
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature-card h4 {
+            font-size: 1.3em;
+            margin-bottom: 12px;
+            color: var(--light);
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.7;
         }
 
         /* Commands Section */
-        .commands {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 40px;
+        #commands {
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
         }
-        .commands h2 {
-            color: #ff6b35;
-            font-size: 1.8em;
-            margin-bottom: 25px;
-            text-align: center;
+
+        .commands-container {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 40px;
+            overflow: hidden;
         }
-        .command-list {
-            display: grid;
+
+        .command-group {
+            margin-bottom: 30px;
+        }
+
+        .command-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .command-group h4 {
+            color: var(--primary);
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
             gap: 10px;
         }
+
         .command-item {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 15px;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
         }
+
+        .command-item:hover {
+            background: rgba(255, 107, 53, 0.1);
+            transform: translateX(5px);
+        }
+
         .command-item code {
-            background: #1a1a2e;
-            padding: 5px 12px;
-            border-radius: 5px;
-            color: #ffd700;
-            font-family: 'Consolas', monospace;
+            background: var(--darker);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--secondary);
+            font-family: 'Consolas', 'Monaco', monospace;
             font-size: 0.9em;
+            white-space: nowrap;
+            border: 1px solid rgba(255, 215, 0, 0.2);
         }
+
         .command-item span {
-            color: #b0b0b0;
+            color: var(--gray);
+            flex: 1;
         }
 
         /* Roles Section */
-        .roles {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 40px;
-        }
-        .roles h2 {
-            color: #c41e3a;
-            font-size: 1.8em;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-        .role-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        .role-item {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .role-item.loup {
-            border: 2px solid #c41e3a;
-        }
-        .role-item.village {
-            border: 2px solid #4a90d9;
-        }
-        .role-item.special {
-            border: 2px solid #9b59b6;
-        }
-        .role-icon {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-        .role-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .role-item.loup .role-name { color: #c41e3a; }
-        .role-item.village .role-name { color: #4a90d9; }
-        .role-item.special .role-name { color: #9b59b6; }
-        .role-desc {
-            font-size: 0.85em;
-            color: #888;
+        #roles {
+            background: linear-gradient(180deg, transparent, rgba(196, 30, 58, 0.03), transparent);
         }
 
+        .roles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .role-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .role-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--role-color) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .role-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .role-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: var(--role-color);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .role-card.loup { --role-color: var(--red); }
+        .role-card.village { --role-color: var(--blue); }
+        .role-card.special { --role-color: var(--purple); }
+
+        .role-icon {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            display: block;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+        }
+
+        .role-card h5 {
+            font-size: 1.2em;
+            color: var(--role-color);
+            margin-bottom: 10px;
+        }
+
+        .role-card p {
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+
+        /* Footer */
         footer {
             text-align: center;
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #666;
+            padding: 60px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.3);
         }
+
+        .footer-logo {
+            font-family: 'Cinzel', serif;
+            font-size: 2em;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .footer-info {
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+
         .credits {
+            font-size: 1.3em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-top: 20px;
-            color: #ff6b35;
-            font-weight: bold;
-            font-size: 1.2em;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            h1 {
+                font-size: 2.5em;
+            }
+
+            .moon {
+                font-size: 5em;
+            }
+
+            .section-title {
+                font-size: 2em;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .command-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="moon">🌕</div>
-            <h1>🐺 LA MEUTE 🐺</h1>
-            <p class="subtitle">Loup-Garou Minecraft</p>
-            <span class="version-badge">Minecraft 1.20.1 • Forge 47.2.0</span>
-        </header>
+    <div class="bg-animation"></div>
+    <div class="stars" id="stars"></div>
 
-        <!-- Download Section -->
-        <div class="download-section">
+    <nav>
+        <a href="#" class="logo">🐺 <span>LA MEUTE</span></a>
+        <ul class="nav-links">
+            <li><a href="#download">Télécharger</a></li>
+            <li><a href="#features">Fonctionnalités</a></li>
+            <li><a href="#commands">Commandes</a></li>
+            <li><a href="#roles">Rôles</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="moon-container">
+                <span class="moon">🌕</span>
+                <span class="wolf-silhouette">🐺</span>
+            </div>
+            <h1>LA MEUTE</h1>
+            <p class="tagline">Le Loup-Garou comme vous ne l'avez jamais joué</p>
+            <div class="version">
+                <span>Minecraft 1.20.1</span>
+                <span>Forge 47.2.0</span>
+                <span>KubeJS</span>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span></span>
+        </div>
+    </section>
+
+    <section id="download">
+        <h2 class="section-title">Téléchargements</h2>
+        <div class="download-grid">
             <div class="download-card client">
-                <h3>🎮 Client</h3>
-                <p>Pour jouer sur le serveur.<br>Contient tous les mods et scripts.</p>
-                <a href="LaMeute-Client.zip" class="download-btn client" download>
-                    ⬇️ Télécharger Client
+                <span class="card-icon">🎮</span>
+                <h3>Client</h3>
+                <p>Tout ce qu'il faut pour rejoindre une partie.<br>Mods + Scripts inclus.</p>
+                <a href="LaMeute-Client.zip" class="download-btn" download>
+                    ⬇️ Télécharger
                 </a>
                 <span class="download-size">~50 MB • Prêt à jouer</span>
             </div>
             <div class="download-card server">
-                <h3>🖥️ Serveur</h3>
-                <p>Pour héberger une partie.<br>Mods + Scripts + Instructions.</p>
-                <a href="LaMeute-Server.zip" class="download-btn server" download>
-                    ⬇️ Télécharger Serveur
+                <span class="card-icon">🖥️</span>
+                <h3>Serveur</h3>
+                <p>Hébergez vos propres parties.<br>Configuration incluse.</p>
+                <a href="LaMeute-Server.zip" class="download-btn" download>
+                    ⬇️ Télécharger
                 </a>
-                <span class="download-size">~34 MB • Forge 1.20.1</span>
+                <span class="download-size">~34 MB • Forge requis</span>
             </div>
             <div class="download-card map">
-                <h3>🗺️ Map</h3>
+                <span class="card-icon">🗺️</span>
+                <h3>Map</h3>
                 <p>Le village de Thiercelieux.<br>Arène de vote + décors.</p>
-                <a href="LaMeute-Map.zip" class="download-btn map" download>
-                    ⬇️ Télécharger Map
+                <a href="LaMeute-Map.zip" class="download-btn" download>
+                    ⬇️ Télécharger
                 </a>
                 <span class="download-size">Bientôt disponible</span>
             </div>
         </div>
+    </section>
 
-        <!-- Features Section -->
-        <div class="features">
-            <h2>✨ Fonctionnalités</h2>
-            <div class="feature-grid">
-                <div class="feature-item">
-                    <h4>🎴 Distribution automatique</h4>
-                    <p>Les rôles sont distribués secrètement à chaque joueur avec une animation dramatique.</p>
-                </div>
-                <div class="feature-item">
-                    <h4>⏱️ Timer automatique</h4>
-                    <p>Jour/Nuit automatique avec barre d'XP. Configurable (3, 5 ou 7 minutes).</p>
-                </div>
-                <div class="feature-item">
-                    <h4>🗳️ Vote par clic</h4>
-                    <p>Clic droit sur un joueur pour voter, clic gauche pour annuler.</p>
-                </div>
-                <div class="feature-item">
-                    <h4>🌙 Nuit immersive</h4>
-                    <p>Effet d'aveuglement la nuit. Les loups voient et se retrouvent.</p>
-                </div>
-                <div class="feature-item">
-                    <h4>📍 Système d'arène</h4>
-                    <p>TP automatique de tous les joueurs en cercle face au centre.</p>
-                </div>
-                <div class="feature-item">
-                    <h4>🏷️ Titres personnalisés</h4>
-                    <p>Ajoutez des titres aux joueurs visibles dans le TAB et le chat.</p>
-                </div>
+    <section id="features">
+        <h2 class="section-title">Fonctionnalités</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">🎴</span>
+                <h4>Distribution Automatique</h4>
+                <p>Les rôles sont distribués secrètement à chaque joueur avec une animation dramatique et des effets sonores immersifs.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">⏱️</span>
+                <h4>Timer Intelligent</h4>
+                <p>Cycle jour/nuit automatique avec barre d'XP. Configurable entre 3, 5 ou 7 minutes selon l'intensité souhaitée.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🗳️</span>
+                <h4>Vote Interactif</h4>
+                <p>Votez en cliquant sur les joueurs. Clic droit pour voter, clic gauche pour annuler. Simple et intuitif.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🌙</span>
+                <h4>Nuit Immersive</h4>
+                <p>Effet d'aveuglement pendant la nuit. Seuls les loups-garous peuvent voir et se retrouver entre eux.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">📍</span>
+                <h4>Système d'Arène</h4>
+                <p>Téléportation automatique de tous les joueurs en cercle, face au centre. Parfait pour les débats.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🏷️</span>
+                <h4>Titres Personnalisés</h4>
+                <p>Attribuez des titres visibles dans le TAB et le chat. Maître du jeu, VIP, et bien plus.</p>
             </div>
         </div>
+    </section>
 
-        <!-- Commands Section -->
-        <div class="commands">
-            <h2>⌨️ Commandes (OP uniquement)</h2>
-            <div class="command-list">
+    <section id="commands">
+        <h2 class="section-title">Commandes</h2>
+        <div class="commands-container">
+            <div class="command-group">
+                <h4>🎮 Gestion de Partie</h4>
                 <div class="command-item">
                     <code>/lameute start &lt;loups&gt;</code>
-                    <span>Démarrer une partie avec X loups-garous</span>
-                </div>
-                <div class="command-item">
-                    <code>/lameute timer auto</code>
-                    <span>Activer le timer automatique jour/nuit</span>
-                </div>
-                <div class="command-item">
-                    <code>/lameute timer jour &lt;3/5/7&gt;</code>
-                    <span>Définir la durée du jour en minutes</span>
-                </div>
-                <div class="command-item">
-                    <code>/lameute arene set</code>
-                    <span>Définir le centre de l'arène (ta position)</span>
-                </div>
-                <div class="command-item">
-                    <code>/lameute arene rayon &lt;2-20&gt;</code>
-                    <span>Modifier le rayon du cercle</span>
-                </div>
-                <div class="command-item">
-                    <code>/lameute arene tp</code>
-                    <span>TP tous les joueurs en cercle</span>
-                </div>
-                <div class="command-item">
-                    <code>/tab &lt;joueur&gt; &lt;titre&gt;</code>
-                    <span>Donner un titre à un joueur</span>
+                    <span>Démarre une partie avec le nombre de loups spécifié</span>
                 </div>
                 <div class="command-item">
                     <code>/lameute roles</code>
-                    <span>Voir la liste des rôles disponibles</span>
+                    <span>Affiche la liste des rôles disponibles</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute role &lt;joueur&gt; &lt;role&gt;</code>
+                    <span>Assigne manuellement un rôle à un joueur</span>
+                </div>
+            </div>
+            <div class="command-group">
+                <h4>⏱️ Timer</h4>
+                <div class="command-item">
+                    <code>/lameute timer auto</code>
+                    <span>Active le cycle jour/nuit automatique</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute timer stop</code>
+                    <span>Arrête le timer</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute timer jour &lt;3/5/7&gt;</code>
+                    <span>Définit la durée du jour en minutes</span>
+                </div>
+            </div>
+            <div class="command-group">
+                <h4>📍 Arène</h4>
+                <div class="command-item">
+                    <code>/lameute arene set</code>
+                    <span>Définit le centre de l'arène à votre position</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute arene rayon &lt;2-20&gt;</code>
+                    <span>Modifie le rayon du cercle de téléportation</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute arene tp</code>
+                    <span>Téléporte tous les joueurs en cercle</span>
+                </div>
+            </div>
+            <div class="command-group">
+                <h4>🏷️ Titres</h4>
+                <div class="command-item">
+                    <code>/tab &lt;joueur&gt; &lt;titre&gt;</code>
+                    <span>Attribue un titre personnalisé à un joueur</span>
+                </div>
+                <div class="command-item">
+                    <code>/tab remove &lt;joueur&gt;</code>
+                    <span>Retire le titre d'un joueur</span>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Roles Section -->
-        <div class="roles">
-            <h2>🎭 Rôles disponibles</h2>
-            <div class="role-grid">
-                <div class="role-item loup">
-                    <div class="role-icon">🐺</div>
-                    <div class="role-name">Loup-Garou</div>
-                    <div class="role-desc">Dévore un villageois chaque nuit</div>
-                </div>
-                <div class="role-item village">
-                    <div class="role-icon">👨‍🌾</div>
-                    <div class="role-name">Villageois</div>
-                    <div class="role-desc">Doit éliminer les loups</div>
-                </div>
-                <div class="role-item special">
-                    <div class="role-icon">🔮</div>
-                    <div class="role-name">Voyante</div>
-                    <div class="role-desc">Voit le rôle d'un joueur</div>
-                </div>
-                <div class="role-item special">
-                    <div class="role-icon">🧪</div>
-                    <div class="role-name">Sorcière</div>
-                    <div class="role-desc">Potions de vie et de mort</div>
-                </div>
-                <div class="role-item special">
-                    <div class="role-icon">🏹</div>
-                    <div class="role-name">Chasseur</div>
-                    <div class="role-desc">Tire sur quelqu'un en mourant</div>
-                </div>
-                <div class="role-item special">
-                    <div class="role-icon">💘</div>
-                    <div class="role-name">Cupidon</div>
-                    <div class="role-desc">Lie deux amoureux</div>
-                </div>
-                <div class="role-item special">
-                    <div class="role-icon">🛡️</div>
-                    <div class="role-name">Salvateur</div>
-                    <div class="role-desc">Protège un joueur la nuit</div>
-                </div>
-                <div class="role-item special">
-                    <div class="role-icon">👧</div>
-                    <div class="role-name">Petite Fille</div>
-                    <div class="role-desc">Peut espionner les loups</div>
-                </div>
+    <section id="roles">
+        <h2 class="section-title">Les Rôles</h2>
+        <div class="roles-grid">
+            <div class="role-card loup">
+                <span class="role-icon">🐺</span>
+                <h5>Loup-Garou</h5>
+                <p>Dévore un villageois chaque nuit</p>
+            </div>
+            <div class="role-card village">
+                <span class="role-icon">👨‍🌾</span>
+                <h5>Villageois</h5>
+                <p>Doit éliminer tous les loups</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">🔮</span>
+                <h5>Voyante</h5>
+                <p>Découvre le rôle d'un joueur</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">🧪</span>
+                <h5>Sorcière</h5>
+                <p>Potions de vie et de mort</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">🏹</span>
+                <h5>Chasseur</h5>
+                <p>Tire sur quelqu'un en mourant</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">💘</span>
+                <h5>Cupidon</h5>
+                <p>Lie deux amoureux à jamais</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">🛡️</span>
+                <h5>Salvateur</h5>
+                <p>Protège un joueur la nuit</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">👧</span>
+                <h5>Petite Fille</h5>
+                <p>Peut espionner les loups</p>
             </div>
         </div>
+    </section>
 
-        <footer>
-            <p>Minecraft 1.20.1 • Forge 47.2.0 • KubeJS</p>
-            <p class="credits">🐺 Développé par w9n0 🐺</p>
-        </footer>
-    </div>
+    <footer>
+        <div class="footer-logo">🐺 LA MEUTE</div>
+        <p class="footer-info">Minecraft 1.20.1 • Forge 47.2.0 • KubeJS</p>
+        <p class="credits">Développé par w9n0</p>
+    </footer>
+
+    <script>
+        // Generate stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            star.style.width = Math.random() * 2 + 1 + 'px';
+            star.style.height = star.style.width;
+            starsContainer.appendChild(star);
+        }
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Navbar background on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(5, 5, 8, 0.95)';
+            } else {
+                nav.style.background = 'rgba(10, 10, 15, 0.8)';
+            }
+        });
+    </script>
 </body>
 </html>
