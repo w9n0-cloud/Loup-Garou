@@ -132,6 +132,32 @@ tenter d'identifier et éliminer les monstres parmi eux.
 
 ---
 
+### 👴 ANCIEN (Camp du Village)
+**Objectif** : Survivre grâce à son expérience
+
+- Résiste à la première attaque des loups-garous la nuit
+- S'il est tué par le vote du village, il perd ses pouvoirs (et meurt)
+- S'il est tué par la sorcière ou le chasseur, il meurt instantanément
+
+**En jeu Minecraft** :
+- 📖 **Item : LIVRE** (Savoir des anciens)
+- Passif : 1 vie supplémentaire contre les loups
+
+---
+
+### 🤡 IDIOT DU VILLAGE (Camp du Village)
+**Objectif** : Aider le village même après avoir été découvert
+
+- Si le village vote pour l'éliminer, il ne meurt pas
+- Il est gracié mais perd son droit de vote pour le reste de la partie
+- Il reste en vie et peut continuer à parler/débattre
+
+**En jeu Minecraft** :
+- 🪶 **Item : PLUME** (Légèreté d'esprit)
+- Passif : Immunité au premier vote d'élimination
+
+---
+
 ## ⏰ DÉROULEMENT D'UNE PARTIE
 
 ### 🌅 PRÉPARATION

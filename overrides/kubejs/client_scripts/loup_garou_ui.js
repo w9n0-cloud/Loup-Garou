@@ -45,4 +45,18 @@ ItemEvents.tooltip(event => {
         '§6🏹 Flèche du Chasseur',
         '§7§oEmportez quelqu\'un dans la tombe...'
     ]);
+
+    // Livre = Ancien
+    event.add('minecraft:book', [
+        '',
+        '§2👴 Savoir de l\'Ancien',
+        '§7§oVotre expérience vous protège...'
+    ]);
+
+    // Plume = Idiot
+    event.add('minecraft:feather', [
+        '',
+        '§e🤡 Folie de l\'Idiot',
+        '§7§oOn ne tue pas l\'idiot du village !'
+    ]);
 });

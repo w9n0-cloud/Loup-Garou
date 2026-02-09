@@ -76,6 +76,25 @@ StartupEvents.registry('item', event => {
         .maxStackSize(1)
         .rarity('rare');
     
+    event.create('lameute:carte_ancien')
+        .displayName('§2§lCarte Ancien')
+        .tooltip('§7Vous êtes l\'§2Ancien§7.')
+        .tooltip('§7Vous résistez à la première attaque des loups.')
+        .tooltip('')
+        .tooltip('§2🛡 SURVIVANT')
+        .maxStackSize(1)
+        .rarity('rare');
+
+    event.create('lameute:carte_idiot')
+        .displayName('§e§lCarte Idiot du Village')
+        .tooltip('§7Vous êtes l\'§eIdiot du Village§7.')
+        .tooltip('§7Si le village vous élimine, vous survivez.')
+        .tooltip('§7Mais vous perdez votre droit de vote.')
+        .tooltip('')
+        .tooltip('§e🤡 GRACIÉ')
+        .maxStackSize(1)
+        .rarity('common');
+
     event.create('lameute:amulette_lune')
         .displayName('§9§lAmulette de Pleine Lune')
         .tooltip('§7Une amulette mystérieuse...')

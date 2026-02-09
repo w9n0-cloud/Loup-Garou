@@ -6,6 +6,8 @@
 // ============================================
 
 let playerTitles = {};
+let ancienLives = {};
+let idiotRevealed = {};
 
 const titleColors = {
     'dev': '§b§l[DEV] ',
@@ -160,12 +162,22 @@ function transitionToDay(server) {
     // Vérifier si la victime était protégée
     let victimProtected = false;
     let victimPlayer = null;
+    let protectionSource = 'none';
     
     server.getPlayers().forEach(p => {
         if (loupTarget && p.name.string === loupTarget) {
             victimPlayer = p;
             if (p.hasTag('protected_tonight')) {
                 victimProtected = true;
+                protectionSource = 'salvateur';
+            } else if (p.hasTag('ancien')) {
+                if (ancienLives[p.name.string] === undefined) ancienLives[p.name.string] = 1;
+                
+                if (ancienLives[p.name.string] > 0) {
+                    victimProtected = true;
+                    protectionSource = 'ancien';
+                    ancienLives[p.name.string]--;
+                }
             }
         }
     });
@@ -179,7 +191,11 @@ function transitionToDay(server) {
         if (loupTarget && !victimProtected) {
             p.tell('§c§l   ☠ ' + loupTarget + ' a été dévoré cette nuit... ☠');
         } else if (loupTarget && victimProtected) {
-            p.tell('§a   ✨ Le Salvateur a protégé quelqu\'un cette nuit !');
+            if (protectionSource === 'ancien') {
+                p.tell('§2   🛡 L\'Ancien a survécu à l\'attaque grâce à sa résistance !');
+            } else {
+                p.tell('§a   ✨ Le Salvateur a protégé quelqu\'un cette nuit !');
+            }
             p.tell('§7   Personne n\'est mort.');
         } else {
             p.tell('§7   Personne n\'est mort cette nuit.');
@@ -277,6 +293,20 @@ function executeVoteResult(server) {
         }
     }
     
+    // Vérifier si c'est l'Idiot du Village
+    let isIdiotSave = false;
+    let eliminatedPlayer = null;
+    
+    if (eliminated) {
+        server.getPlayers().forEach(p => {
+            if (p.name.string === eliminated) eliminatedPlayer = p;
+        });
+        
+        if (eliminatedPlayer && eliminatedPlayer.hasTag('idiot') && !idiotRevealed[eliminated]) {
+            isIdiotSave = true;
+        }
+    }
+
     server.getPlayers().forEach(p => {
         p.tell('');
         p.tell('§6§l═══════════════════════════════════════════════════');
@@ -289,26 +319,29 @@ function executeVoteResult(server) {
         }
         
         p.tell('');
-        if (eliminated) {
+        if (eliminated && isIdiotSave) {
+            p.tell('§e§l  🤡 ' + eliminated + ' est l\'Idiot du Village !');
+            p.tell('§7  Le village le gracie, mais il perd son droit de vote.');
+            idiotRevealed[eliminated] = true;
+        } else if (eliminated) {
             p.tell('§4§l  ☠ ' + eliminated + ' est éliminé avec ' + maxVotes + ' vote(s) !');
             
             // Révéler le rôle
-            server.getPlayers().forEach(target => {
-                if (target.name.string === eliminated) {
-                    let role = 'Villageois';
-                    if (target.hasTag('loup_garou')) role = '§cLOUP-GAROU 🐺';
-                    else if (target.hasTag('voyante')) role = '§bVoyante';
-                    else if (target.hasTag('sorciere')) role = '§dSorcière';
-                    else if (target.hasTag('chasseur')) role = '§6Chasseur';
-                    else if (target.hasTag('cupidon')) role = '§eCupidon';
-                    else if (target.hasTag('salvateur')) role = '§fSalvateur';
-                    else if (target.hasTag('petite_fille')) role = '§ePetite Fille';
-                    else role = '§aVillageois';
-                    
-                    p.tell('§7  Son rôle était : ' + role);
-                    target.kill();
-                }
-            });
+            let role = 'Villageois';
+            if (eliminatedPlayer) {
+                if (eliminatedPlayer.hasTag('loup_garou')) role = '§cLOUP-GAROU 🐺';
+                else if (eliminatedPlayer.hasTag('voyante')) role = '§bVoyante';
+                else if (eliminatedPlayer.hasTag('sorciere')) role = '§dSorcière';
+                else if (eliminatedPlayer.hasTag('chasseur')) role = '§6Chasseur';
+                else if (eliminatedPlayer.hasTag('cupidon')) role = '§eCupidon';
+                else if (eliminatedPlayer.hasTag('salvateur')) role = '§fSalvateur';
+                else if (eliminatedPlayer.hasTag('petite_fille')) role = '§ePetite Fille';
+                else if (eliminatedPlayer.hasTag('ancien')) role = '§2Ancien';
+                else if (eliminatedPlayer.hasTag('idiot')) role = '§eIdiot du Village';
+                else role = '§aVillageois';
+            }
+            
+            p.tell('§7  Son rôle était : ' + role);
         } else {
             p.tell('§7  Aucun vote enregistré. Personne n\'est éliminé.');
         }
@@ -320,6 +353,11 @@ function executeVoteResult(server) {
             'minecraft:entity.lightning_bolt.thunder', 'players', 0.5, 0.8);
     });
     
+    // Tuer le joueur si ce n'est pas l'idiot
+    if (eliminatedPlayer && !isIdiotSave) {
+        eliminatedPlayer.kill();
+    }
+
     votes = {};
 }
 
@@ -475,6 +513,20 @@ function revealRoleToPlayer(player, role) {
             roleDescription = 'Espionnez les loups... sans vous faire voir !';
             roleItem = 'Restez cachée et observez';
             break;
+        case 'ancien':
+            roleName = 'ANCIEN';
+            roleColor = '§2';
+            roleEmoji = '👴';
+            roleDescription = 'Vous survivez à la première attaque des loups.';
+            roleItem = 'Votre expérience et votre ténacité';
+            break;
+        case 'idiot':
+            roleName = 'IDIOT DU VILLAGE';
+            roleColor = '§e';
+            roleEmoji = '🤡';
+            roleDescription = 'Si le village vous vote, vous survivez mais ne votez plus.';
+            roleItem = 'Votre folie douce';
+            break;
         default:
             roleName = 'VILLAGEOIS';
             roleColor = '§a';
@@ -509,7 +561,7 @@ function revealRoleToPlayer(player, role) {
     
     // Ajouter le tag du rôle
     const allRoles = ['loup_garou', 'villageois', 'voyante', 'sorciere', 
-                     'chasseur', 'cupidon', 'salvateur', 'petite_fille'];
+                     'chasseur', 'cupidon', 'salvateur', 'petite_fille', 'ancien', 'idiot'];
     allRoles.forEach(r => player.removeTag(r));
     player.addTag(role);
     
@@ -534,6 +586,12 @@ function revealRoleToPlayer(player, role) {
             break;
         case 'salvateur':
             player.give('minecraft:shield');
+            break;
+        case 'ancien':
+            player.give('minecraft:book'); // Savoir des anciens
+            break;
+        case 'idiot':
+            player.give('minecraft:feather'); // Légèreté d'esprit
             break;
     }
 }
@@ -616,6 +674,8 @@ ItemEvents.rightClicked('minecraft:spider_eye', event => {
         else if (target.hasTag('cupidon')) role = '§eCupidon';
         else if (target.hasTag('salvateur')) role = '§fSalvateur';
         else if (target.hasTag('petite_fille')) role = '§ePetite Fille';
+        else if (target.hasTag('ancien')) role = '§2Ancien';
+        else if (target.hasTag('idiot')) role = '§eIdiot du Village';
         
         player.tell('§b§l══════════════════════════════');
         player.tell('§b      👁 VISION DE LA VOYANTE 👁');
@@ -938,6 +998,8 @@ PlayerEvents.tick(event => {
         else if (player.hasTag('cupidon')) { role = '§eCupidon'; roleEmoji = '💕'; }
         else if (player.hasTag('salvateur')) { role = '§fSalvateur'; roleEmoji = '🛡'; }
         else if (player.hasTag('petite_fille')) { role = '§ePetite§eFille'; roleEmoji = '👀'; }
+        else if (player.hasTag('ancien')) { role = '§2Ancien'; roleEmoji = '👴'; }
+        else if (player.hasTag('idiot')) { role = '§eIdiot'; roleEmoji = '🤡'; }
         else if (player.hasTag('villageois')) { role = '§aVillageois'; roleEmoji = '🏠'; }
         
         // Déterminer la phase actuelle
@@ -981,6 +1043,8 @@ PlayerEvents.tick(event => {
         else if (player.hasTag('cupidon')) { role = 'Cupidon 💕'; color = '§e'; }
         else if (player.hasTag('salvateur')) { role = 'Salvateur 🛡'; color = '§f'; }
         else if (player.hasTag('petite_fille')) { role = 'Petite Fille 👀'; color = '§e'; }
+        else if (player.hasTag('ancien')) { role = 'Ancien 👴'; color = '§2'; }
+        else if (player.hasTag('idiot')) { role = 'Idiot 🤡'; color = '§e'; }
         else if (player.hasTag('villageois')) { role = 'Villageois 🏠'; color = '§a'; }
         
         // Afficher dans l'action bar
@@ -997,6 +1061,12 @@ PlayerEvents.entityInteracted(event => {
     if (target.type === 'minecraft:player' && votePhaseActive) {
         const voterName = player.name.string;
         const targetName = target.name.string;
+        
+        // Vérifier si le joueur a le droit de voter (Idiot révélé)
+        if (idiotRevealed[voterName]) {
+            player.tell('§c[Vote] §7L\'Idiot du Village ne peut plus voter !');
+            return;
+        }
         
         // Enregistrer le vote
         votes[voterName] = targetName;
@@ -1131,6 +1201,8 @@ ServerEvents.commandRegistry(event => {
                         if (players.length >= 10) roles.push('cupidon');
                         if (players.length >= 12) roles.push('salvateur');
                         if (players.length >= 14) roles.push('petite_fille');
+                        if (players.length >= 9) roles.push('ancien');
+                        if (players.length >= 11) roles.push('idiot');
                         
                         // Compléter avec des villageois
                         while (roles.length < players.length) {
@@ -1160,6 +1232,8 @@ ServerEvents.commandRegistry(event => {
                         
                         // Distribution des cartes avec délai
                         gameStarted = true;
+                        ancienLives = {};
+                        idiotRevealed = {};
                         
                         // Distribuer les cartes à chaque joueur avec un délai
                         for (let i = 0; i < players.length; i++) {
@@ -1288,6 +1362,8 @@ ServerEvents.commandRegistry(event => {
                     ctx.source.player.tell('§e• cupidon §7- Lie les amoureux');
                     ctx.source.player.tell('§f• salvateur §7- Protège la nuit');
                     ctx.source.player.tell('§e• petite_fille §7- Espionne');
+                    ctx.source.player.tell('§2• ancien §7- Résiste aux loups');
+                    ctx.source.player.tell('§e• idiot §7- Survit au vote');
                     return 1;
                 })
             )
@@ -1373,6 +1449,10 @@ ServerEvents.commandRegistry(event => {
                             
                             // Ajouter le nouveau rôle
                             targetPlayer.addTag(role);
+                            
+                            // Reset états spéciaux
+                            if (role === 'ancien') ancienLives[targetPlayer.name.string] = 1;
+                            
                             targetPlayer.tell('§6§l[La Meute] §rVotre rôle est maintenant : §e' + role);
                             
                             return 1;
