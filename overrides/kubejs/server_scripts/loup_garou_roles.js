@@ -92,8 +92,21 @@ let timerConfig = {
     currentPhase: 'none',
     timerStartTime: 0,
     timerRunning: false,
-    autoMode: false
+    autoMode: false,
+    dayCount: 0
 };
+
+// ============================================
+// 👑 SYSTÈME DE MAIRE
+// ============================================
+let maire = null;
+let maireVoteActive = false;
+let maireVotes = {};
+
+// ============================================
+// ☠️ JOUEURS MORTS (Spectateurs)
+// ============================================
+let deadPlayers = {};
 
 let nightActionsCompleted = {
     loups: false,
@@ -136,6 +149,7 @@ function allNightActionsComplete(level) {
 
 // Fonction pour passer au jour (utilisée par le timer)
 function transitionToDay(server) {
+    timerConfig.dayCount++;
     timerConfig.currentPhase = 'day';
     timerConfig.timerStartTime = Date.now();
     votePhaseActive = true;
@@ -182,44 +196,93 @@ function transitionToDay(server) {
         }
     });
     
+    // Mettre le temps du jour
+    server.runCommandSilent('time set day');
+    
+    // ════════════════════════════════════════════
+    // 🎭 ANNONCE DRAMATIQUE DU LEVER DU JOUR
+    // ════════════════════════════════════════════
+    
+    // Étape 1 : Écran noir et suspense
     server.getPlayers().forEach(p => {
-        p.tell('');
-        p.tell('§6§l═══════════════════════════════════════════════════');
-        p.tell('§e§l              ☀️ LE JOUR SE LÈVE ☀️');
-        p.tell('');
-        
-        if (loupTarget && !victimProtected) {
-            p.tell('§c§l   ☠ ' + loupTarget + ' a été dévoré cette nuit... ☠');
-        } else if (loupTarget && victimProtected) {
-            if (protectionSource === 'ancien') {
-                p.tell('§2   🛡 L\'Ancien a survécu à l\'attaque grâce à sa résistance !');
-            } else {
-                p.tell('§a   ✨ Le Salvateur a protégé quelqu\'un cette nuit !');
-            }
-            p.tell('§7   Personne n\'est mort.');
-        } else {
-            p.tell('§7   Personne n\'est mort cette nuit.');
-        }
-        
-        p.tell('');
-        p.tell('§a   📊 La barre d\'XP = temps restant pour voter');
-        p.tell('§a   👆 CLIC DROIT sur un joueur pour VOTER !');
-        p.tell('§7      Clic gauche pour retirer votre vote.');
-        p.tell('§6§l═══════════════════════════════════════════════════');
-        p.tell('');
-        
-        // Mettre le temps du jour
-        p.level.setDayTime(1000);
-        
-        // Jouer le son
-        p.level.playSound(null, p.blockPosition(),
-            'minecraft:entity.chicken.ambient', 'ambient', 2.0, 0.8);
+        p.server.runCommandSilent('title ' + p.name.string + ' times 20 60 20');
+        p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"☀️ JOUR ' + timerConfig.dayCount + '","color":"gold","bold":true}');
+        p.level.playSound(null, p.blockPosition(), 'minecraft:entity.chicken.ambient', 'ambient', 2.0, 0.8);
     });
     
-    // Tuer la victime
-    if (victimPlayer && !victimProtected) {
-        victimPlayer.kill();
-    }
+    // Étape 2 : Annonce de la victime (après 2 secondes)
+    server.scheduleInTicks(40, () => {
+        if (loupTarget && !victimProtected) {
+            // Annonce dramatique de la mort
+            server.getPlayers().forEach(p => {
+                p.server.runCommandSilent('title ' + p.name.string + ' times 10 80 20');
+                p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"a été dévoré(e) par les loups...","color":"gray","italic":true}');
+                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"☠ ' + loupTarget + ' ☠","color":"dark_red","bold":true}');
+                p.level.playSound(null, p.blockPosition(), 'minecraft:entity.lightning_bolt.thunder', 'players', 0.8, 0.5);
+            });
+            
+            // Mettre le mort en spectateur
+            if (victimPlayer) {
+                deadPlayers[loupTarget] = true;
+                victimPlayer.server.runCommandSilent('gamemode spectator ' + loupTarget);
+                victimPlayer.tell('');
+                victimPlayer.tell('§4§l════════════════════════════════════════════════');
+                victimPlayer.tell('§c§l           ☠ VOUS ÊTES MORT(E) ☠');
+                victimPlayer.tell('§4§l════════════════════════════════════════════════');
+                victimPlayer.tell('');
+                victimPlayer.tell('§7  Vous êtes maintenant en mode §8SPECTATEUR');
+                victimPlayer.tell('§7  Vos messages dans le chat ne seront vus que par le §6MJ');
+                victimPlayer.tell('§7  Observez la partie en silence...');
+                victimPlayer.tell('');
+            }
+        } else if (loupTarget && victimProtected) {
+            server.getPlayers().forEach(p => {
+                p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 20');
+                if (protectionSource === 'ancien') {
+                    p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🛡 L\'Ancien a survécu !","color":"green","bold":true}');
+                } else {
+                    p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"✨ Personne n\'est mort !","color":"green","bold":true}');
+                }
+                p.level.playSound(null, p.blockPosition(), 'minecraft:entity.player.levelup', 'players', 1.0, 1.2);
+            });
+        } else {
+            server.getPlayers().forEach(p => {
+                p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 20');
+                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🌅 Nuit paisible","color":"green"}');
+            });
+        }
+    });
+    
+    // Étape 3 : Instructions de vote (après 5 secondes)
+    server.scheduleInTicks(100, () => {
+        server.getPlayers().forEach(p => {
+            p.tell('');
+            p.tell('§6§l═══════════════════════════════════════════════════');
+            p.tell('§e§l              ☀️ JOUR ' + timerConfig.dayCount + ' ☀️');
+            p.tell('§6§l═══════════════════════════════════════════════════');
+            p.tell('');
+            p.tell('§a   👆 CLIC DROIT sur un joueur pour VOTER');
+            p.tell('§7   Clic gauche pour annuler votre vote');
+            p.tell('§7   📊 Barre XP = temps restant');
+            p.tell('');
+        });
+        
+        // Vote du Maire au Jour 2
+        if (timerConfig.dayCount === 2 && !maire) {
+            maireVoteActive = true;
+            maireVotes = {};
+            server.getPlayers().forEach(p => {
+                p.tell('§6§l═══════════════════════════════════════════════════');
+                p.tell('§e§l        👑 ÉLECTION DU MAIRE 👑');
+                p.tell('§6§l═══════════════════════════════════════════════════');
+                p.tell('');
+                p.tell('§7  Votez pour élire le Maire du village !');
+                p.tell('§e  Le vote du Maire compte §l§6DOUBLE §r§7!');
+                p.tell('');
+                p.level.playSound(null, p.blockPosition(), 'minecraft:ui.toast.challenge_complete', 'players', 1.0, 1.0);
+            });
+        }
+    });
 }
 
 // Fonction pour passer à la nuit (utilisée par le timer)
@@ -276,21 +339,39 @@ function transitionToNight(server) {
 
 // Fonction pour exécuter le résultat du vote
 function executeVoteResult(server) {
-    // Compter les votes
+    // Compter les votes (le maire compte double)
     let voteCount = {};
     for (let voter in votes) {
         let target = votes[voter];
-        voteCount[target] = (voteCount[target] || 0) + 1;
+        let voteWeight = (voter === maire) ? 2 : 1; // Maire = vote double
+        voteCount[target] = (voteCount[target] || 0) + voteWeight;
     }
     
     // Trouver le joueur le plus voté
     let maxVotes = 0;
     let eliminated = null;
+    let isTie = false;
+    let tiedPlayers = [];
+    
     for (let player in voteCount) {
         if (voteCount[player] > maxVotes) {
             maxVotes = voteCount[player];
             eliminated = player;
+            tiedPlayers = [player];
+        } else if (voteCount[player] === maxVotes) {
+            tiedPlayers.push(player);
+            isTie = true;
         }
+    }
+    
+    // En cas d'égalité, vérifier le Bouc Émissaire
+    if (isTie && tiedPlayers.length > 1) {
+        server.getPlayers().forEach(p => {
+            if (p.hasTag('bouc') && !deadPlayers[p.name.string]) {
+                eliminated = p.name.string;
+                isTie = false;
+            }
+        });
     }
     
     // Vérifier si c'est l'Idiot du Village
@@ -310,39 +391,65 @@ function executeVoteResult(server) {
     server.getPlayers().forEach(p => {
         p.tell('');
         p.tell('§6§l═══════════════════════════════════════════════════');
-        p.tell('§c§l              ⚖️ RÉSULTAT DU VOTE ⚖️');
+        
+        // Si c'est un vote du maire
+        if (maireVoteActive) {
+            p.tell('§e§l              👑 ÉLECTION DU MAIRE 👑');
+        } else {
+            p.tell('§c§l              ⚖️ RÉSULTAT DU VOTE ⚖️');
+        }
         p.tell('');
         
         // Afficher tous les votes
         for (let voter in votes) {
-            p.tell('§7  ' + voter + ' → §c' + votes[voter]);
+            let voteText = '§7  ' + voter;
+            if (voter === maire) voteText += ' §6§l(x2)';
+            voteText += ' → §c' + votes[voter];
+            p.tell(voteText);
         }
         
         p.tell('');
-        if (eliminated && isIdiotSave) {
+        
+        // Si c'est l'élection du maire
+        if (maireVoteActive && eliminated) {
+            p.tell('§e§l  👑 ' + eliminated + ' est élu(e) MAIRE !');
+            p.tell('§7  Son vote comptera §6DOUBLE §7lors des prochains votes.');
+            maire = eliminated;
+            maireVoteActive = false;
+        } else if (eliminated && isIdiotSave) {
             p.tell('§e§l  🤡 ' + eliminated + ' est l\'Idiot du Village !');
             p.tell('§7  Le village le gracie, mais il perd son droit de vote.');
             idiotRevealed[eliminated] = true;
-        } else if (eliminated) {
+        } else if (eliminated && !maireVoteActive) {
             p.tell('§4§l  ☠ ' + eliminated + ' est éliminé avec ' + maxVotes + ' vote(s) !');
             
             // Révéler le rôle
             let role = 'Villageois';
             if (eliminatedPlayer) {
                 if (eliminatedPlayer.hasTag('loup_garou')) role = '§cLOUP-GAROU 🐺';
+                else if (eliminatedPlayer.hasTag('loup_blanc')) role = '§fLOUP BLANC 🐺';
+                else if (eliminatedPlayer.hasTag('loup_alpha')) role = '§4LOUP ALPHA 🐺';
+                else if (eliminatedPlayer.hasTag('infect')) role = '§5INFECTÉ 🦠';
                 else if (eliminatedPlayer.hasTag('voyante')) role = '§bVoyante';
                 else if (eliminatedPlayer.hasTag('sorciere')) role = '§dSorcière';
+                else if (eliminatedPlayer.hasTag('sorciere_noire')) role = '§0Sorcière Noire';
                 else if (eliminatedPlayer.hasTag('chasseur')) role = '§6Chasseur';
                 else if (eliminatedPlayer.hasTag('cupidon')) role = '§eCupidon';
                 else if (eliminatedPlayer.hasTag('salvateur')) role = '§fSalvateur';
                 else if (eliminatedPlayer.hasTag('petite_fille')) role = '§ePetite Fille';
                 else if (eliminatedPlayer.hasTag('ancien')) role = '§2Ancien';
                 else if (eliminatedPlayer.hasTag('idiot')) role = '§eIdiot du Village';
+                else if (eliminatedPlayer.hasTag('ange')) role = '§bAnge 😇';
+                else if (eliminatedPlayer.hasTag('joueur_flute')) role = '§dJoueur de Flûte 🎵';
+                else if (eliminatedPlayer.hasTag('corbeau')) role = '§8Corbeau';
+                else if (eliminatedPlayer.hasTag('renard')) role = '§6Renard';
+                else if (eliminatedPlayer.hasTag('bouc')) role = '§cBouc Émissaire';
+                else if (eliminatedPlayer.hasTag('chevalier')) role = '§9Chevalier';
                 else role = '§aVillageois';
             }
             
             p.tell('§7  Son rôle était : ' + role);
-        } else {
+        } else if (!eliminated) {
             p.tell('§7  Aucun vote enregistré. Personne n\'est éliminé.');
         }
         p.tell('§6§l═══════════════════════════════════════════════════');
@@ -353,9 +460,18 @@ function executeVoteResult(server) {
             'minecraft:entity.lightning_bolt.thunder', 'players', 0.5, 0.8);
     });
     
-    // Tuer le joueur si ce n'est pas l'idiot
-    if (eliminatedPlayer && !isIdiotSave) {
-        eliminatedPlayer.kill();
+    // Mettre en spectateur si ce n'est pas l'idiot et pas l'élection du maire
+    if (eliminatedPlayer && !isIdiotSave && !maireVoteActive) {
+        deadPlayers[eliminated] = true;
+        server.runCommandSilent('gamemode spectator ' + eliminated);
+        eliminatedPlayer.tell('');
+        eliminatedPlayer.tell('§4§l════════════════════════════════════════════════');
+        eliminatedPlayer.tell('§c§l           ☠ VOUS ÊTES MORT(E) ☠');
+        eliminatedPlayer.tell('§4§l════════════════════════════════════════════════');
+        eliminatedPlayer.tell('');
+        eliminatedPlayer.tell('§7  Vous êtes maintenant en mode §8SPECTATEUR');
+        eliminatedPlayer.tell('§7  Vos messages seront vus uniquement par le §6MJ');
+        eliminatedPlayer.tell('');
     }
 
     votes = {};
@@ -1410,6 +1526,22 @@ ServerEvents.commandRegistry(event => {
                         ancienLives = {};
                         idiotRevealed = {};
                         
+                        // Réinitialiser pour la nouvelle partie
+                        timerConfig.dayCount = 0;
+                        timerConfig.timerRunning = true;
+                        timerConfig.autoMode = true;
+                        deadPlayers = {};
+                        maire = null;
+                        maireVoteActive = false;
+                        maireVotes = {};
+                        votes = {};
+                        publicVotes = false;
+                        
+                        // Mettre tout le monde en survival
+                        ctx.source.level.players.forEach(p => {
+                            ctx.source.server.runCommandSilent('gamemode survival ' + p.name.string);
+                        });
+                        
                         // Distribuer les cartes à chaque joueur avec un délai
                         for (let i = 0; i < players.length; i++) {
                             const player = players[i];
@@ -1810,6 +1942,56 @@ ServerEvents.commandRegistry(event => {
                             p.tell('§6§l[La Meute] §aLes votes sont maintenant §l§8ANONYMES');
                             p.tell('§7  → Personne ne verra les votes avant le décompte');
                         });
+                        return 1;
+                    })
+                )
+            )
+            .then(Commands.literal('maire')
+                .then(Commands.argument('joueur', Arguments.STRING.create(event))
+                    .executes(ctx => {
+                        const targetName = Arguments.STRING.getResult(ctx, 'joueur');
+                        
+                        let targetPlayer = null;
+                        ctx.source.level.players.forEach(p => {
+                            if (p.name.string.toLowerCase() === targetName.toLowerCase()) {
+                                targetPlayer = p;
+                            }
+                        });
+                        
+                        if (!targetPlayer) {
+                            ctx.source.player.tell('§c[Maire] §7Joueur "' + targetName + '" non trouvé !');
+                            return 0;
+                        }
+                        
+                        maire = targetPlayer.name.string;
+                        
+                        ctx.source.level.players.forEach(p => {
+                            p.tell('');
+                            p.tell('§6§l═══════════════════════════════════════════════════');
+                            p.tell('§e§l             👑 NOUVEAU MAIRE 👑');
+                            p.tell('');
+                            p.tell('§f             ' + maire + ' §7est maintenant §eMaire !');
+                            p.tell('§7             Son vote compte §6DOUBLE');
+                            p.tell('§6§l═══════════════════════════════════════════════════');
+                            p.tell('');
+                            p.level.playSound(null, p.blockPosition(), 'minecraft:ui.toast.challenge_complete', 'players', 1.0, 1.0);
+                        });
+                        
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('remove')
+                    .executes(ctx => {
+                        if (!maire) {
+                            ctx.source.player.tell('§c[Maire] §7Il n\'y a pas de maire actuellement.');
+                            return 0;
+                        }
+                        
+                        ctx.source.level.players.forEach(p => {
+                            p.tell('§6§l[La Meute] §7' + maire + ' n\'est plus Maire.');
+                        });
+                        
+                        maire = null;
                         return 1;
                     })
                 )
@@ -2259,23 +2441,37 @@ PlayerEvents.chat(event => {
     // Vérifier si le joueur est MJ
     const isMJ = title.toLowerCase().includes('mj') || title.toLowerCase().includes('maitre');
     
-    // Si c'est la nuit et le joueur n'est pas MJ
-    if (nightPhaseActive && !isMJ) {
-        // Message visible uniquement par le MJ
+    // Vérifier si le joueur est mort (spectateur)
+    const isDead = deadPlayers[playerName] === true;
+    
+    // Si le joueur est mort, seul le MJ voit son message
+    if (isDead && !isMJ) {
         player.server.players.forEach(p => {
             const pTitle = playerTitles[p.name.string] || 'Joueur';
             const pIsMJ = pTitle.toLowerCase().includes('mj') || pTitle.toLowerCase().includes('maitre');
             
             if (pIsMJ) {
-                // Le MJ voit le message avec indication que c'est un chuchotement de nuit
+                p.tell('§8[☠ Mort] ' + formattedTitle + '§f' + playerName + ' §7→ §f' + message);
+            }
+        });
+        
+        player.tell('§8[☠ → MJ] §7Votre message a été envoyé au Maître du Jeu.');
+        console.log('[Chat Mort] ' + playerName + ' -> MJ: ' + message);
+        return;
+    }
+    
+    // Si c'est la nuit et le joueur n'est pas MJ
+    if (nightPhaseActive && !isMJ) {
+        player.server.players.forEach(p => {
+            const pTitle = playerTitles[p.name.string] || 'Joueur';
+            const pIsMJ = pTitle.toLowerCase().includes('mj') || pTitle.toLowerCase().includes('maitre');
+            
+            if (pIsMJ) {
                 p.tell('§8[🌙 Nuit] ' + formattedTitle + '§f' + playerName + ' §7→ §f' + message);
             }
         });
         
-        // Confirmer à l'envoyeur que son message a été envoyé au MJ
         player.tell('§8[🌙 → MJ] §7Votre message a été envoyé au Maître du Jeu.');
-        
-        // Log dans la console
         console.log('[Chat Nuit] ' + playerName + ' -> MJ: ' + message);
         return;
     }
@@ -2287,6 +2483,5 @@ PlayerEvents.chat(event => {
         p.tell(formattedMessage);
     });
     
-    // Log dans la console
     console.log('[Chat] ' + title + ' ' + playerName + ': ' + message);
 });

@@ -64,6 +64,32 @@ Change le mode d'affichage des votes.
 
 ---
 
+### `/lameute maire <joueur>`
+Nomme un joueur comme Maire du village.
+- Le vote du Maire compte **DOUBLE**
+- Utilisez `/lameute maire remove` pour retirer le maire
+
+**Note :** L'élection du Maire se fait automatiquement au **Jour 2** par vote.
+
+---
+
+## 👑 SYSTÈME DE MAIRE
+
+- **Élection automatique** au Jour 2
+- **Vote double** : Le vote du Maire compte x2
+- Si le Maire meurt, il peut désigner son successeur (non implémenté encore)
+
+---
+
+## ☠️ MODE SPECTATEUR
+
+Quand un joueur meurt :
+- Il passe automatiquement en **mode spectateur**
+- Ses messages dans le chat ne sont vus que par le **MJ**
+- Il peut observer la partie sans interférer
+
+---
+
 ## 📖 LIVRE DES RÈGLES
 
 Chaque joueur reçoit automatiquement un **Livre des Règles** personnel contenant :
