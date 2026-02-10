@@ -1587,70 +1587,126 @@ ServerEvents.commandRegistry(event => {
     // Fonction pour vérifier si le joueur est OP (niveau 2+)
     const requiresOP = (source) => source.hasPermission(2);
     
+    // Fonction pour calculer la distribution équitable des rôles
+    function calculateRoleDistribution(playerCount) {
+        // Calcul automatique du nombre de loups (environ 1 pour 4-5 joueurs)
+        let nbLoups;
+        if (playerCount <= 5) nbLoups = 1;
+        else if (playerCount <= 8) nbLoups = 2;
+        else if (playerCount <= 12) nbLoups = 3;
+        else if (playerCount <= 16) nbLoups = 4;
+        else nbLoups = Math.floor(playerCount / 4);
+        
+        let roles = [];
+        let specialRolesPool = [];
+        
+        // === LOUPS-GAROUS ===
+        // Pool de variantes de loups disponibles
+        let loupVariants = ['loup_garou']; // Toujours au moins 1 loup normal
+        if (playerCount >= 8) loupVariants.push('loup_blanc'); // Le loup blanc trahit
+        if (playerCount >= 10) loupVariants.push('loup_alpha'); // Le loup alpha infecte
+        
+        // Distribuer les loups
+        for (let i = 0; i < nbLoups; i++) {
+            if (i === 0) {
+                roles.push('loup_garou'); // Premier loup toujours normal
+            } else if (i === 1 && loupVariants.includes('loup_blanc') && Math.random() > 0.5) {
+                roles.push('loup_blanc');
+            } else if (i === 2 && loupVariants.includes('loup_alpha') && Math.random() > 0.5) {
+                roles.push('loup_alpha');
+            } else {
+                roles.push('loup_garou');
+            }
+        }
+        
+        // === ROLES SPECIAUX DU VILLAGE ===
+        // Rôles prioritaires (toujours présents si assez de joueurs)
+        if (playerCount >= 5) specialRolesPool.push('voyante');
+        if (playerCount >= 6) specialRolesPool.push('sorciere');
+        if (playerCount >= 7) specialRolesPool.push('chasseur');
+        
+        // Rôles secondaires
+        if (playerCount >= 8) specialRolesPool.push('salvateur');
+        if (playerCount >= 9) specialRolesPool.push('ancien');
+        if (playerCount >= 10) specialRolesPool.push('cupidon');
+        
+        // Rôles avancés
+        if (playerCount >= 11) specialRolesPool.push('petite_fille');
+        if (playerCount >= 12) specialRolesPool.push('chevalier');
+        if (playerCount >= 13) specialRolesPool.push('renard');
+        
+        // Rôles ambigus/spéciaux (ajoutés avec parcimonie)
+        if (playerCount >= 10) specialRolesPool.push('idiot');
+        if (playerCount >= 14) specialRolesPool.push('ange');
+        if (playerCount >= 15) specialRolesPool.push('joueur_flute');
+        if (playerCount >= 16) specialRolesPool.push('corbeau');
+        if (playerCount >= 18) specialRolesPool.push('bouc_emissaire');
+        
+        // Limiter le nombre de rôles spéciaux (max 60% des joueurs non-loups)
+        const maxSpecialRoles = Math.floor((playerCount - nbLoups) * 0.6);
+        while (specialRolesPool.length > maxSpecialRoles) {
+            specialRolesPool.pop();
+        }
+        
+        // Ajouter les rôles spéciaux
+        roles = roles.concat(specialRolesPool);
+        
+        // Compléter avec des villageois
+        while (roles.length < playerCount) {
+            roles.push('villageois');
+        }
+        
+        return { roles: roles, nbLoups: nbLoups };
+    }
+    
     // Commande pour démarrer une partie avec distribution automatique
     event.register(
         Commands.literal('lameute')
             .requires(requiresOP)
             .then(Commands.literal('start')
-                .then(Commands.argument('loups', Arguments.INTEGER.create(event))
-                    .executes(ctx => {
-                        const nbLoups = Arguments.INTEGER.getResult(ctx, 'loups');
-                        const players = [];
-                        let mjPlayer = null;
+                .executes(ctx => {
+                    // Version sans argument - distribution automatique
+                    const players = [];
+                    let mjPlayer = null;
+                    
+                    // Détecter si un MJ est présent
+                    ctx.source.level.players.forEach(p => {
+                        const title = playerTitles[p.name.string] || '';
+                        const isMJ = title.toLowerCase().includes('mj') || title.toLowerCase().includes('maitre');
                         
-                        // Détecter si un MJ est présent
-                        ctx.source.level.players.forEach(p => {
-                            const title = playerTitles[p.name.string] || '';
-                            const isMJ = title.toLowerCase().includes('mj') || title.toLowerCase().includes('maitre');
-                            
-                            if (isMJ) {
-                                mjPlayer = p;
-                                hasMJ = true;
-                            } else {
-                                players.push(p);
-                            }
-                        });
-                        
-                        // Si pas de MJ, le jeu sera automatique
-                        if (!mjPlayer) {
-                            hasMJ = false;
-                            ctx.source.player.tell('§6§l[La Meute] §a🤖 Mode automatique activé §7(pas de MJ détecté)');
+                        if (isMJ) {
+                            mjPlayer = p;
+                            hasMJ = true;
                         } else {
-                            ctx.source.player.tell('§6§l[La Meute] §e👑 ' + mjPlayer.name.string + ' §7est le Maître du Jeu');
+                            players.push(p);
                         }
-                        
-                        if (players.length < 4) {
-                            ctx.source.player.tell('§c[La Meute] §7Il faut au moins 4 joueurs pour commencer !');
-                            return 0;
-                        }
-                        
-                        if (nbLoups >= players.length / 2) {
-                            ctx.source.player.tell('§c[La Meute] §7Trop de loups-garous ! Maximum : ' + Math.floor(players.length / 2 - 1));
-                            return 0;
-                        }
-                        
-                        // Créer la liste des rôles
-                        let roles = [];
-                        
-                        // Ajouter les loups-garous
-                        for (let i = 0; i < nbLoups; i++) {
-                            roles.push('loup_garou');
-                        }
-                        
-                        // Ajouter les rôles spéciaux selon le nombre de joueurs
-                        if (players.length >= 6) roles.push('voyante');
-                        if (players.length >= 7) roles.push('sorciere');
-                        if (players.length >= 8) roles.push('chasseur');
-                        if (players.length >= 10) roles.push('cupidon');
-                        if (players.length >= 12) roles.push('salvateur');
-                        if (players.length >= 14) roles.push('petite_fille');
-                        if (players.length >= 9) roles.push('ancien');
-                        if (players.length >= 11) roles.push('idiot');
-                        
-                        // Compléter avec des villageois
-                        while (roles.length < players.length) {
-                            roles.push('villageois');
-                        }
+                    });
+                    
+                    // Si pas de MJ, le jeu sera automatique
+                    if (!mjPlayer) {
+                        hasMJ = false;
+                        ctx.source.player.tell('§6§l[La Meute] §a🤖 Mode automatique activé §7(pas de MJ détecté)');
+                    } else {
+                        ctx.source.player.tell('§6§l[La Meute] §e👑 ' + mjPlayer.name.string + ' §7est le Maître du Jeu');
+                    }
+                    
+                    if (players.length < 4) {
+                        ctx.source.player.tell('§c[La Meute] §7Il faut au moins 4 joueurs pour commencer !');
+                        return 0;
+                    }
+                    
+                    // Calculer la distribution automatique
+                    const distribution = calculateRoleDistribution(players.length);
+                    let roles = distribution.roles;
+                    const nbLoups = distribution.nbLoups;
+                    
+                    // Afficher les stats de la partie
+                    ctx.source.player.tell('§6§l[La Meute] §7Distribution automatique :');
+                    ctx.source.player.tell('§7  • §c' + nbLoups + ' Loup(s)-Garou(s)');
+                    ctx.source.player.tell('§7  • §a' + (players.length - nbLoups) + ' Villageois (dont rôles spéciaux)');
+                    
+                    // Mélanger les rôles
+                    roles = shuffleArray(roles);
                         
                         // Mélanger les rôles
                         roles = shuffleArray(roles);
@@ -1741,7 +1797,6 @@ ServerEvents.commandRegistry(event => {
                         
                         return 1;
                     })
-                )
             )
             .then(Commands.literal('timer')
                 .then(Commands.literal('auto')

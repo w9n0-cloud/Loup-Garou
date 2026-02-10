@@ -5,12 +5,26 @@
 
 ## 🎮 COMMANDES DU JEU
 
-### `/lameute start <nombre_de_loups>`
-Lance une nouvelle partie avec distribution automatique des rôles.
-- Distribue les cartes à tous les joueurs connectés
-- Le nombre de loups est à définir selon les joueurs présents
+### `/lameute start`
+Lance une nouvelle partie avec **distribution automatique et équitable des rôles**.
+- Compte automatiquement les joueurs présents
+- Calcule le nombre optimal de loups-garous (1 pour 4-5j, 2 pour 6-8j, 3 pour 9-12j, etc.)
+- Distribue les rôles spéciaux selon le nombre de joueurs
+- Détecte automatiquement si un MJ est présent (titre contenant "MJ" ou "Maitre")
+- Lance le mode automatique si aucun MJ n'est détecté
 
-**Exemple:** `/lameute start 2` (2 loups-garous)
+**Exemple:** `/lameute start` (c'est tout !)
+
+**Distribution automatique :**
+| Joueurs | Loups | Rôles spéciaux inclus |
+|---------|-------|----------------------|
+| 4-5 | 1 | Voyante |
+| 6 | 2 | Voyante, Sorcière |
+| 7 | 2 | + Chasseur |
+| 8 | 2 | + Salvateur, Loup Blanc possible |
+| 9 | 3 | + Ancien |
+| 10 | 3 | + Cupidon, Idiot, Loup Alpha possible |
+| 11+ | 3+ | + Petite Fille, Chevalier, Renard... |
 
 ---
 
