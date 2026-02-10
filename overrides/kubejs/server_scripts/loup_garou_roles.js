@@ -1008,8 +1008,8 @@ function giveRuleBook(player, role, roleName, roleDescription) {
     player.server.runCommandSilent(bookCommand);
 }
 
-// Événement pour cliquer et révéler la carte
-PlayerEvents.rightClickedBlock(event => {
+// Événement pour cliquer et révéler la carte (clic droit sur bloc ou item)
+BlockEvents.rightClicked(event => {
     const player = event.player;
     const playerName = player.name.string;
     
@@ -1020,20 +1020,6 @@ PlayerEvents.rightClickedBlock(event => {
         
         revealRoleToPlayer(player, role);
         event.cancel();
-    }
-});
-
-// Alternative : clic droit dans le vide
-PlayerEvents.rightClickedEmpty(event => {
-    const player = event.player;
-    const playerName = player.name.string;
-    
-    // Vérifier si ce joueur a une carte en attente
-    if (pendingCardReveal[playerName]) {
-        const role = pendingCardReveal[playerName];
-        delete pendingCardReveal[playerName];
-        
-        revealRoleToPlayer(player, role);
     }
 });
 
@@ -1482,89 +1468,6 @@ PlayerEvents.tick(event => {
         
         // Afficher dans l'action bar
         player.displayClientMessage(color + 'Votre rôle : ' + role, true);
-    }
-});
-
-// Système de vote par clic droit sur un joueur
-PlayerEvents.entityInteracted(event => {
-    const player = event.player;
-    const target = event.target;
-    
-    // Vérifier que c'est un clic droit sur un autre joueur
-    if (target.type === 'minecraft:player' && votePhaseActive) {
-        const voterName = player.name.string;
-        const targetName = target.name.string;
-        
-        // Vérifier si le joueur a le droit de voter (Idiot révélé)
-        if (idiotRevealed[voterName]) {
-            player.tell('§c[Vote] §7L\'Idiot du Village ne peut plus voter !');
-            return;
-        }
-        
-        // Enregistrer le vote
-        votes[voterName] = targetName;
-        
-        // Notifier le votant
-        player.tell('§6[Vote] §aVous avez voté contre §c' + targetName);
-        
-        // Annoncer à tout le monde
-        if (publicVotes) {
-            // Votes publics : tout le monde voit qui vote qui
-            player.level.players.forEach(p => {
-                p.tell('');
-                p.tell('§6§l══════════════════════════════════════════');
-                p.tell('§e§l   VILLAGEOIS DE THIERCELIEUX');
-                p.tell('§f   ' + voterName + ' §7a décidé de voter pour §c' + targetName);
-                p.tell('§6§l══════════════════════════════════════════');
-            });
-        } else {
-            // Votes anonymes : on sait juste que quelqu'un a voté
-            player.level.players.forEach(p => {
-                if (p.name.string !== voterName) {
-                    p.tell('§6[Vote] §e' + voterName + ' §7a voté !');
-                }
-            });
-        }
-        
-        // Son de vote
-        player.level.playSound(null, player.blockPosition(), 
-            'minecraft:block.note_block.pling', 'players', 1.0, 1.5);
-    }
-});
-
-// Retirer son vote par clic gauche sur un joueur
-PlayerEvents.attack(event => {
-    const player = event.player;
-    const target = event.target;
-    
-    // Vérifier que c'est un clic gauche sur un autre joueur pendant le vote
-    if (target.type === 'minecraft:player' && votePhaseActive) {
-        const voterName = player.name.string;
-        
-        // Vérifier si le joueur a déjà voté
-        if (votes[voterName]) {
-            delete votes[voterName];
-            
-            // Notifier le votant
-            player.tell('§6[Vote] §eVous avez retiré votre vote.');
-            
-            // Annoncer à tout le monde
-            player.level.players.forEach(p => {
-                if (p.name.string !== voterName) {
-                    p.tell('§6[Vote] §e' + voterName + ' §7a retiré son vote.');
-                }
-            });
-            
-            // Son d'annulation
-            player.level.playSound(null, player.blockPosition(), 
-                'minecraft:block.note_block.bass', 'players', 1.0, 0.8);
-            
-            // Annuler l'attaque (ne pas faire de dégâts)
-            event.cancel();
-        } else {
-            player.tell('§6[Vote] §7Vous n\'avez pas encore voté.');
-            event.cancel();
-        }
     }
 });
 
