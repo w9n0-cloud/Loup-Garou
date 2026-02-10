@@ -963,10 +963,11 @@ function giveRuleBook(player, role, roleName, roleDescription) {
     if (role === 'loup_garou' || role === 'loup_blanc' || role === 'loup_alpha' || role === 'infect') {
         equipe = '§cLoups';
         objectif = 'Dévorez tous les Villageois !';
-    } else if (role === 'ange' || role === 'joueur_flute') {
+    } else if (role === 'ange' || role === 'joueur_flute' || role === 'sorciere_noire') {
         equipe = '§eSolitaire';
         if (role === 'ange') objectif = 'Faites-vous éliminer au premier vote !';
         if (role === 'joueur_flute') objectif = 'Charmez tous les joueurs vivants !';
+        if (role === 'sorciere_noire') objectif = 'Faites mourir votre maudit par vote !';
     }
     
     // Créer le livre via commande
@@ -1659,7 +1660,7 @@ ServerEvents.commandRegistry(event => {
         if (playerCount >= 14) specialRolesPool.push('ange');
         if (playerCount >= 15) specialRolesPool.push('joueur_flute');
         if (playerCount >= 16) specialRolesPool.push('corbeau');
-        if (playerCount >= 18) specialRolesPool.push('bouc_emissaire');
+        if (playerCount >= 18) specialRolesPool.push('bouc');
         
         // Limiter le nombre de rôles spéciaux (max 60% des joueurs non-loups)
         const maxSpecialRoles = Math.floor((playerCount - nbLoups) * 0.6);
