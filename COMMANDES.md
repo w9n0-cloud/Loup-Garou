@@ -136,6 +136,22 @@ Affiche la liste de tous les titres disponibles.
 
 ---
 
+## 🌙 CHAT DE NUIT
+
+**Pendant la nuit :**
+- Les messages des joueurs sont **visibles uniquement par le MJ**
+- Le MJ peut toujours parler à tout le monde
+- Les joueurs reçoivent une confirmation que leur message a été envoyé
+
+**Format des messages de nuit :**
+```
+[🌙 Nuit] [Titre] Joueur → Message
+```
+
+Cela permet aux rôles de communiquer avec le MJ sans que les autres joueurs entendent !
+
+---
+
 ## 📊 SCOREBOARD
 
 Le scoreboard affiche en permanence :

@@ -2163,7 +2163,31 @@ PlayerEvents.chat(event => {
     // Annuler le message original
     event.cancel();
     
-    // Envoyer le message formaté à tous les joueurs
+    // Vérifier si le joueur est MJ
+    const isMJ = title.toLowerCase().includes('mj') || title.toLowerCase().includes('maitre');
+    
+    // Si c'est la nuit et le joueur n'est pas MJ
+    if (nightPhaseActive && !isMJ) {
+        // Message visible uniquement par le MJ
+        player.server.players.forEach(p => {
+            const pTitle = playerTitles[p.name.string] || 'Joueur';
+            const pIsMJ = pTitle.toLowerCase().includes('mj') || pTitle.toLowerCase().includes('maitre');
+            
+            if (pIsMJ) {
+                // Le MJ voit le message avec indication que c'est un chuchotement de nuit
+                p.tell('§8[🌙 Nuit] ' + formattedTitle + '§f' + playerName + ' §7→ §f' + message);
+            }
+        });
+        
+        // Confirmer à l'envoyeur que son message a été envoyé au MJ
+        player.tell('§8[🌙 → MJ] §7Votre message a été envoyé au Maître du Jeu.');
+        
+        // Log dans la console
+        console.log('[Chat Nuit] ' + playerName + ' -> MJ: ' + message);
+        return;
+    }
+    
+    // Message normal (jour ou MJ)
     const formattedMessage = formattedTitle + '§f' + playerName + ' §7» §f' + message;
     
     player.server.players.forEach(p => {
