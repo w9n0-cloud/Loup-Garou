@@ -1733,6 +1733,266 @@ ServerEvents.commandRegistry(event => {
                     return 1;
                 })
             )
+            // ============================================
+            // 📢 SYSTÈME D'APPEL DES RÔLES (NUIT)
+            // ============================================
+            .then(Commands.literal('appel')
+                .then(Commands.literal('loups')
+                    .executes(ctx => {
+                        ctx.source.level.players.forEach(p => {
+                            if (p.hasTag('loup_garou') || p.hasTag('loup_blanc') || p.hasTag('loup_alpha')) {
+                                p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 10');
+                                p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"Vous pouvez parler au MJ","color":"gray"}');
+                                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🐺 LOUPS, RÉVEILLEZ-VOUS !","color":"red","bold":true}');
+                                p.tell('');
+                                p.tell('§c§l🐺 ════════════════════════════════════════ 🐺');
+                                p.tell('§c§l         LES LOUPS SE RÉVEILLENT !');
+                                p.tell('§c§l🐺 ════════════════════════════════════════ 🐺');
+                                p.tell('');
+                                p.tell('§7  → §fVous pouvez maintenant parler au §6§lMaître du Jeu');
+                                p.tell('§7  → §fDésignez votre victime avec un §cOS');
+                                p.tell('§7  → §fLes autres loups peuvent aussi parler');
+                                p.tell('');
+                                p.level.playSound(null, p.blockPosition(), 'minecraft:entity.wolf.growl', 'players', 1.0, 0.8);
+                            } else {
+                                p.server.runCommandSilent('title ' + p.name.string + ' times 10 40 10');
+                                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🌙 Dormez...","color":"gray"}');
+                            }
+                        });
+                        ctx.source.player.tell('§a[MJ] §7Les loups ont été appelés.');
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('voyante')
+                    .executes(ctx => {
+                        ctx.source.level.players.forEach(p => {
+                            if (p.hasTag('voyante')) {
+                                p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 10');
+                                p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"Vous pouvez parler au MJ","color":"gray"}');
+                                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"👁 VOYANTE, RÉVEILLEZ-VOUS !","color":"aqua","bold":true}');
+                                p.tell('');
+                                p.tell('§b§l👁 ════════════════════════════════════════ 👁');
+                                p.tell('§b§l         LA VOYANTE SE RÉVEILLE !');
+                                p.tell('§b§l👁 ════════════════════════════════════════ 👁');
+                                p.tell('');
+                                p.tell('§7  → §fVous pouvez maintenant parler au §6§lMaître du Jeu');
+                                p.tell('§7  → §fUtilisez un §bŒil d\'araignée §fpour sonder un joueur');
+                                p.tell('');
+                                p.level.playSound(null, p.blockPosition(), 'minecraft:block.enchantment_table.use', 'players', 1.0, 1.2);
+                            } else if (!p.hasTag('loup_garou') && !p.hasTag('loup_blanc') && !p.hasTag('loup_alpha')) {
+                                p.server.runCommandSilent('title ' + p.name.string + ' times 10 40 10');
+                                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🌙 Dormez...","color":"gray"}');
+                            }
+                        });
+                        ctx.source.player.tell('§a[MJ] §7La voyante a été appelée.');
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('sorciere')
+                    .executes(ctx => {
+                        ctx.source.level.players.forEach(p => {
+                            if (p.hasTag('sorciere') || p.hasTag('sorciere_noire')) {
+                                p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 10');
+                                p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"Vous pouvez parler au MJ","color":"gray"}');
+                                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"⚗ SORCIÈRE, RÉVEILLEZ-VOUS !","color":"light_purple","bold":true}');
+                                p.tell('');
+                                p.tell('§d§l⚗ ════════════════════════════════════════ ⚗');
+                                p.tell('§d§l         LA SORCIÈRE SE RÉVEILLE !');
+                                p.tell('§d§l⚗ ════════════════════════════════════════ ⚗');
+                                p.tell('');
+                                p.tell('§7  → §fVous pouvez maintenant parler au §6§lMaître du Jeu');
+                                p.tell('§7  → §aPomme dorée §f= Potion de vie');
+                                p.tell('§7  → §4Rose des ténèbres §f= Potion de mort');
+                                p.tell('');
+                                p.level.playSound(null, p.blockPosition(), 'minecraft:entity.witch.ambient', 'players', 1.0, 1.0);
+                            }
+                        });
+                        ctx.source.player.tell('§a[MJ] §7La sorcière a été appelée.');
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('salvateur')
+                    .executes(ctx => {
+                        ctx.source.level.players.forEach(p => {
+                            if (p.hasTag('salvateur')) {
+                                p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 10');
+                                p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"Vous pouvez parler au MJ","color":"gray"}');
+                                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🛡 SALVATEUR, RÉVEILLEZ-VOUS !","color":"white","bold":true}');
+                                p.tell('');
+                                p.tell('§f§l🛡 ════════════════════════════════════════ 🛡');
+                                p.tell('§f§l         LE SALVATEUR SE RÉVEILLE !');
+                                p.tell('§f§l🛡 ════════════════════════════════════════ 🛡');
+                                p.tell('');
+                                p.tell('§7  → §fVous pouvez maintenant parler au §6§lMaître du Jeu');
+                                p.tell('§7  → §fUtilisez un §fBouclier §fpour protéger quelqu\'un');
+                                p.tell('');
+                                p.level.playSound(null, p.blockPosition(), 'minecraft:item.shield.block', 'players', 1.0, 1.0);
+                            }
+                        });
+                        ctx.source.player.tell('§a[MJ] §7Le salvateur a été appelé.');
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('cupidon')
+                    .executes(ctx => {
+                        ctx.source.level.players.forEach(p => {
+                            if (p.hasTag('cupidon')) {
+                                p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 10');
+                                p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"Vous pouvez parler au MJ","color":"gray"}');
+                                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"💕 CUPIDON, RÉVEILLEZ-VOUS !","color":"light_purple","bold":true}');
+                                p.tell('');
+                                p.tell('§d§l💕 ════════════════════════════════════════ 💕');
+                                p.tell('§d§l         CUPIDON SE RÉVEILLE !');
+                                p.tell('§d§l💕 ════════════════════════════════════════ 💕');
+                                p.tell('');
+                                p.tell('§7  → §fVous pouvez maintenant parler au §6§lMaître du Jeu');
+                                p.tell('§7  → §fUtilisez un §dCoquelicot §fpour lier deux amoureux');
+                                p.tell('');
+                                p.level.playSound(null, p.blockPosition(), 'minecraft:entity.experience_orb.pickup', 'players', 1.0, 1.5);
+                            }
+                        });
+                        ctx.source.player.tell('§a[MJ] §7Cupidon a été appelé.');
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('chasseur')
+                    .executes(ctx => {
+                        ctx.source.level.players.forEach(p => {
+                            if (p.hasTag('chasseur')) {
+                                p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 10');
+                                p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"Vous pouvez parler au MJ","color":"gray"}');
+                                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🏹 CHASSEUR, RÉVEILLEZ-VOUS !","color":"gold","bold":true}');
+                                p.tell('');
+                                p.tell('§6§l🏹 ════════════════════════════════════════ 🏹');
+                                p.tell('§6§l         LE CHASSEUR SE RÉVEILLE !');
+                                p.tell('§6§l🏹 ════════════════════════════════════════ 🏹');
+                                p.tell('');
+                                p.tell('§7  → §fVous pouvez maintenant parler au §6§lMaître du Jeu');
+                                p.tell('§7  → §fUtilisez votre §6Arc §fpour emporter quelqu\'un');
+                                p.tell('');
+                                p.level.playSound(null, p.blockPosition(), 'minecraft:entity.arrow.shoot', 'players', 1.0, 1.0);
+                            }
+                        });
+                        ctx.source.player.tell('§a[MJ] §7Le chasseur a été appelé.');
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('renard')
+                    .executes(ctx => {
+                        ctx.source.level.players.forEach(p => {
+                            if (p.hasTag('renard')) {
+                                p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 10');
+                                p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"Vous pouvez parler au MJ","color":"gray"}');
+                                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🦊 RENARD, RÉVEILLEZ-VOUS !","color":"gold","bold":true}');
+                                p.tell('');
+                                p.tell('§6§l🦊 ════════════════════════════════════════ 🦊');
+                                p.tell('§6§l         LE RENARD SE RÉVEILLE !');
+                                p.tell('§6§l🦊 ════════════════════════════════════════ 🦊');
+                                p.tell('');
+                                p.tell('§7  → §fVous pouvez maintenant parler au §6§lMaître du Jeu');
+                                p.tell('§7  → §fUtilisez une §6Carotte §fpour flairer 3 joueurs');
+                                p.tell('');
+                                p.level.playSound(null, p.blockPosition(), 'minecraft:entity.fox.sniff', 'players', 1.0, 1.0);
+                            }
+                        });
+                        ctx.source.player.tell('§a[MJ] §7Le renard a été appelé.');
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('joueur_flute')
+                    .executes(ctx => {
+                        ctx.source.level.players.forEach(p => {
+                            if (p.hasTag('joueur_flute')) {
+                                p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 10');
+                                p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"Vous pouvez parler au MJ","color":"gray"}');
+                                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🎵 JOUEUR DE FLÛTE, RÉVEILLEZ-VOUS !","color":"light_purple","bold":true}');
+                                p.tell('');
+                                p.tell('§d§l🎵 ════════════════════════════════════════ 🎵');
+                                p.tell('§d§l      LE JOUEUR DE FLÛTE SE RÉVEILLE !');
+                                p.tell('§d§l🎵 ════════════════════════════════════════ 🎵');
+                                p.tell('');
+                                p.tell('§7  → §fVous pouvez maintenant parler au §6§lMaître du Jeu');
+                                p.tell('§7  → §fDesignez §d2 joueurs §fà charmer cette nuit');
+                                p.tell('');
+                                p.level.playSound(null, p.blockPosition(), 'minecraft:block.note_block.flute', 'players', 1.0, 1.0);
+                            }
+                        });
+                        ctx.source.player.tell('§a[MJ] §7Le joueur de flûte a été appelé.');
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('corbeau')
+                    .executes(ctx => {
+                        ctx.source.level.players.forEach(p => {
+                            if (p.hasTag('corbeau')) {
+                                p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 10');
+                                p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"Vous pouvez parler au MJ","color":"gray"}');
+                                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🐦 CORBEAU, RÉVEILLEZ-VOUS !","color":"dark_gray","bold":true}');
+                                p.tell('');
+                                p.tell('§8§l🐦 ════════════════════════════════════════ 🐦');
+                                p.tell('§8§l         LE CORBEAU SE RÉVEILLE !');
+                                p.tell('§8§l🐦 ════════════════════════════════════════ 🐦');
+                                p.tell('');
+                                p.tell('§7  → §fVous pouvez maintenant parler au §6§lMaître du Jeu');
+                                p.tell('§7  → §fDésignez qui recevra §c+2 votes §fdemain');
+                                p.tell('');
+                                p.level.playSound(null, p.blockPosition(), 'minecraft:entity.parrot.ambient', 'players', 1.0, 0.5);
+                            }
+                        });
+                        ctx.source.player.tell('§a[MJ] §7Le corbeau a été appelé.');
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('tous')
+                    .executes(ctx => {
+                        ctx.source.level.players.forEach(p => {
+                            p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 10');
+                            p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"Tout le monde peut parler","color":"gray"}');
+                            p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"☀️ TOUT LE MONDE SE RÉVEILLE !","color":"yellow","bold":true}');
+                            p.tell('');
+                            p.tell('§e§l☀️ ════════════════════════════════════════ ☀️');
+                            p.tell('§e§l         TOUT LE MONDE SE RÉVEILLE !');
+                            p.tell('§e§l☀️ ════════════════════════════════════════ ☀️');
+                            p.tell('');
+                            p.tell('§7  → §fTout le monde peut maintenant parler');
+                            p.tell('');
+                            p.level.playSound(null, p.blockPosition(), 'minecraft:entity.player.levelup', 'players', 1.0, 1.0);
+                        });
+                        ctx.source.player.tell('§a[MJ] §7Tout le monde a été réveillé.');
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('silence')
+                    .executes(ctx => {
+                        ctx.source.level.players.forEach(p => {
+                            p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 10');
+                            p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🤫 SILENCE...","color":"gray","bold":true}');
+                            p.tell('');
+                            p.tell('§7§l🤫 ════════════════════════════════════════ 🤫');
+                            p.tell('§7§l              SILENCE ABSOLU');
+                            p.tell('§7§l🤫 ════════════════════════════════════════ 🤫');
+                            p.tell('');
+                            p.tell('§8  → Personne ne doit parler');
+                            p.tell('');
+                        });
+                        ctx.source.player.tell('§a[MJ] §7Silence demandé.');
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('dors')
+                    .executes(ctx => {
+                        ctx.source.level.players.forEach(p => {
+                            if (!playerTitles[p.name.string] || !playerTitles[p.name.string].toLowerCase().includes('mj') && !playerTitles[p.name.string].toLowerCase().includes('maitre')) {
+                                p.server.runCommandSilent('title ' + p.name.string + ' times 10 40 10');
+                                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"💤 Rendormez-vous...","color":"dark_gray"}');
+                                p.tell('§8  💤 Vous vous rendormez...');
+                            }
+                        });
+                        ctx.source.player.tell('§a[MJ] §7Les joueurs se rendorment.');
+                        return 1;
+                    })
+                )
+            )
     );
     
     // ============================================

@@ -46,6 +46,40 @@ Joue un hurlement de loup pour l'ambiance.
 
 ---
 
+## 📢 APPEL DES RÔLES (Maître du Jeu)
+
+Pendant la nuit, le MJ peut appeler chaque rôle individuellement.
+**Seul le rôle appelé voit le titre et peut parler au MJ.**
+
+| Commande | Rôle appelé |
+|----------|-------------|
+| `/lameute appel loups` | 🐺 Loups-Garous, Loup Blanc, Loup Alpha |
+| `/lameute appel voyante` | 👁 Voyante |
+| `/lameute appel sorciere` | ⚗ Sorcière et Sorcière Noire |
+| `/lameute appel salvateur` | 🛡 Salvateur |
+| `/lameute appel cupidon` | 💕 Cupidon |
+| `/lameute appel chasseur` | 🏹 Chasseur |
+| `/lameute appel renard` | 🦊 Renard |
+| `/lameute appel joueur_flute` | 🎵 Joueur de Flûte |
+| `/lameute appel corbeau` | 🐦 Corbeau |
+| `/lameute appel tous` | ☀️ Réveille tout le monde |
+| `/lameute appel silence` | 🤫 Demande le silence |
+| `/lameute appel dors` | 💤 Rendort tout le monde |
+
+**Déroulement type d'une nuit :**
+1. `/lameute nuit` - La nuit tombe
+2. `/lameute appel cupidon` - (Première nuit seulement)
+3. `/lameute appel dors`
+4. `/lameute appel voyante`
+5. `/lameute appel dors`
+6. `/lameute appel loups`
+7. `/lameute appel dors`
+8. `/lameute appel sorciere`
+9. `/lameute appel dors`
+10. `/lameute jour` - Le jour se lève
+
+---
+
 ## 🏷️ COMMANDES DE TITRES
 
 ### `/tab <joueur> <titre>`
