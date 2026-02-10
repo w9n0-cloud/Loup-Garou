@@ -87,6 +87,8 @@ let maireVotes = {};
 
 let deadPlayers = {};
 
+let sorciereNoireCurse = null; // Joueur maudit par la Sorcière Noire
+
 let nightActionsCompleted = {
     loups: false,
     voyante: false,
@@ -572,6 +574,35 @@ function executeVoteResult(server) {
     if (eliminatedPlayer && !isIdiotSave && !maireVoteActive) {
         deadPlayers[eliminated] = true;
         server.runCommandSilent('gamemode spectator ' + eliminated);
+        
+        // Vérifier si la Sorcière Noire gagne (victime = joueur maudit)
+        if (sorciereNoireCurse && eliminated === sorciereNoireCurse) {
+            server.scheduleInTicks(60, () => {
+                server.getPlayers().forEach(p => {
+                    p.tell('');
+                    p.tell('§0§l════════════════════════════════════════════════════════');
+                    p.tell('');
+                    p.tell('§0§l          🖤 LA SORCIÈRE NOIRE A GAGNÉ ! 🖤');
+                    p.tell('');
+                    p.tell('§7  §f' + eliminated + ' §7était §0§lMAUDIT§7.');
+                    p.tell('§7  En mourant par le vote du village, la malédiction s\'accomplit.');
+                    p.tell('');
+                    p.tell('§0§l════════════════════════════════════════════════════════');
+                    p.tell('');
+                    
+                    p.server.runCommandSilent('title ' + p.name.string + ' times 20 100 20');
+                    p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"La malédiction s\'accomplit...","color":"dark_gray"}');
+                    p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🖤 SORCIÈRE NOIRE GAGNE 🖤","color":"black","bold":true}');
+                    
+                    p.level.playSound(null, p.blockPosition(),
+                        'minecraft:entity.wither.spawn', 'players', 1.0, 0.5);
+                });
+                
+                gameStarted = false;
+                sorciereNoireCurse = null;
+            });
+        }
+        
         eliminatedPlayer.tell('');
         eliminatedPlayer.tell('§4§l════════════════════════════════════════════════');
         eliminatedPlayer.tell('§c§l           ☠ VOUS ÊTES MORT(E) ☠');
@@ -808,7 +839,7 @@ function revealRoleToPlayer(player, role) {
             roleName = 'SORCIÈRE NOIRE';
             roleColor = '§0';
             roleEmoji = '🖤';
-            roleDescription = 'Maudissez un joueur : le prochain à voter contre lui meurt !';
+            roleDescription = 'Maudissez un joueur au début. S\'il meurt par vote, vous gagnez !';
             roleItem = 'ENCRE pour maudire';
             break;
         case 'chevalier':
@@ -1331,6 +1362,52 @@ ItemEvents.rightClicked('minecraft:bow', event => {
     }
 });
 
+ItemEvents.rightClicked('minecraft:ink_sac', event => {
+    const player = event.player;
+    
+    if (!player.hasTag('sorciere_noire')) return;
+    
+    if (sorciereNoireCurse) {
+        player.tell('§0[Sorcière Noire] §7Vous avez déjà maudit §c' + sorciereNoireCurse + '§7.');
+        return;
+    }
+    
+    const lookingAt = player.rayTrace(10, true);
+    if (lookingAt && lookingAt.entity && lookingAt.entity.type === 'minecraft:player') {
+        const target = lookingAt.entity;
+        const targetName = target.name.string;
+        
+        if (targetName === player.name.string) {
+            player.tell('§0[Sorcière Noire] §7Vous ne pouvez pas vous maudire vous-même !');
+            return;
+        }
+        
+        sorciereNoireCurse = targetName;
+        
+        player.tell('');
+        player.tell('§0§l════════════════════════════════════════════════');
+        player.tell('§0§l           🖤 MALÉDICTION LANCÉE 🖤');
+        player.tell('§0§l════════════════════════════════════════════════');
+        player.tell('');
+        player.tell('§7  Vous avez maudit §f§l' + targetName + '§7.');
+        player.tell('§7  S\'il meurt pendant un §evote de jour§7,');
+        player.tell('§7  vous §0§lGAGNEZ LA PARTIE§7 !');
+        player.tell('');
+        
+        // Retirer l'encre
+        event.item.count--;
+        
+        player.level.playSound(null, player.blockPosition(), 
+            'minecraft:entity.wither.ambient', 'players', 0.5, 0.5);
+            
+        player.server.runCommandSilent('title ' + player.name.string + ' times 10 40 10');
+        player.server.runCommandSilent('title ' + player.name.string + ' subtitle {"text":"' + targetName + ' est maudit...","color":"dark_gray"}');
+        player.server.runCommandSilent('title ' + player.name.string + ' title {"text":"🖤 MALÉDICTION 🖤","color":"black","bold":true}');
+    } else {
+        player.tell('§0[Sorcière Noire] §7Regardez un joueur pour le maudire.');
+    }
+});
+
 let lastScoreboardUpdate = {};
 
 PlayerEvents.tick(event => {
@@ -1686,6 +1763,7 @@ ServerEvents.commandRegistry(event => {
                         maireVotes = {};
                         votes = {};
                         publicVotes = false;
+                        sorciereNoireCurse = null;
                         
                         // Mettre tout le monde en survival
                         ctx.source.level.players.forEach(p => {

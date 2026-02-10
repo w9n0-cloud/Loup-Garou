@@ -103,7 +103,8 @@ ItemEvents.tooltip(event => {
     event.add('minecraft:ink_sac', [
         '',
         '§0🖤 Malédiction de la Sorcière Noire',
-        '§7§oLe prochain votant mourra...'
+        '§7§oMaudissez un joueur.',
+        '§7§oS\'il meurt par vote, vous gagnez !'
     ]);
 
     // Épée = Chevalier

@@ -175,10 +175,10 @@ StartupEvents.registry('item', event => {
     event.create('lameute:carte_sorciere_noire')
         .displayName('§5§lCarte Sorcière Noire')
         .tooltip('§7Vous êtes la §5Sorcière Noire§7.')
-        .tooltip('§7Chaque nuit, maudissez un joueur.')
-        .tooltip('§7Il mourra dans 2 tours.')
+        .tooltip('§7Au début, maudissez un joueur.')
+        .tooltip('§7S\'il meurt par vote de jour, vous gagnez !')
         .tooltip('')
-        .tooltip('§5☠ MALÉDICTION')
+        .tooltip('§5🖤 MALÉDICTION FATALE')
         .maxStackSize(1)
         .rarity('epic');
 
