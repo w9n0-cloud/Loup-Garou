@@ -311,20 +311,6 @@ function transitionToNight(server) {
         p.tell('§7   📊 La barre d\'XP = temps restant');
         p.tell('§7   ⚡ Si tout le monde joue vite, la nuit passe plus vite !');
         p.tell('');
-        
-        if (p.hasTag('loup_garou')) {
-            p.tell('§c     🐺 Utilisez un OS sur un joueur pour le dévorer');
-        }
-        if (p.hasTag('voyante')) {
-            p.tell('§b     👁 Utilisez un ŒIL D\'ARAIGNÉE pour voir un rôle');
-        }
-        if (p.hasTag('sorciere')) {
-            p.tell('§d     ⚗ POMME DORÉE = vie | ROSE DES TÉNÈBRES = mort');
-        }
-        if (p.hasTag('salvateur')) {
-            p.tell('§f     🛡 Utilisez un BOUCLIER pour protéger quelqu\'un');
-        }
-        
         p.tell('§8§l═══════════════════════════════════════════════════');
         p.tell('');
         
@@ -334,6 +320,152 @@ function transitionToNight(server) {
         // Jouer le son
         p.level.playSound(null, p.blockPosition(),
             'minecraft:entity.wolf.howl', 'ambient', 1.0, 0.6);
+    });
+    
+    // Si pas de MJ, lancer les annonces automatiques
+    if (!hasMJ) {
+        autoNightPhase = 1;
+        runAutoNightSequence(server);
+    }
+}
+
+// ============================================
+// 🤖 SYSTÈME DE NUIT AUTOMATIQUE (Sans MJ)
+// ============================================
+function runAutoNightSequence(server) {
+    // Phase 1 : Cupidon (première nuit seulement)
+    if (timerConfig.dayCount === 0) {
+        server.scheduleInTicks(40, () => {
+            autoCallRole(server, 'cupidon', '💕 CUPIDON', 'Liez deux joueurs par l\'amour !', 'light_purple');
+        });
+        
+        // Phase 2 : Voyante après 15 secondes
+        server.scheduleInTicks(340, () => {
+            autoCallRole(server, 'voyante', '👁 VOYANTE', 'Sondez le rôle d\'un joueur.', 'aqua');
+        });
+        
+        // Phase 3 : Loups après 30 secondes
+        server.scheduleInTicks(640, () => {
+            autoCallLoups(server);
+        });
+        
+        // Phase 4 : Sorcière après 50 secondes
+        server.scheduleInTicks(1040, () => {
+            autoCallRole(server, 'sorciere', '⚗ SORCIÈRE', 'Utilisez vos potions si vous le souhaitez.', 'light_purple');
+        });
+        
+        // Phase 5 : Salvateur après 60 secondes
+        server.scheduleInTicks(1240, () => {
+            autoCallRole(server, 'salvateur', '🛡 SALVATEUR', 'Protégez un joueur cette nuit.', 'white');
+        });
+    } else {
+        // Nuits suivantes (pas de Cupidon)
+        
+        // Voyante
+        server.scheduleInTicks(40, () => {
+            autoCallRole(server, 'voyante', '👁 VOYANTE', 'Sondez le rôle d\'un joueur.', 'aqua');
+        });
+        
+        // Loups
+        server.scheduleInTicks(340, () => {
+            autoCallLoups(server);
+        });
+        
+        // Sorcière
+        server.scheduleInTicks(740, () => {
+            autoCallRole(server, 'sorciere', '⚗ SORCIÈRE', 'Utilisez vos potions si vous le souhaitez.', 'light_purple');
+        });
+        
+        // Salvateur
+        server.scheduleInTicks(940, () => {
+            autoCallRole(server, 'salvateur', '🛡 SALVATEUR', 'Protégez un joueur cette nuit.', 'white');
+        });
+        
+        // Renard
+        server.scheduleInTicks(1040, () => {
+            autoCallRole(server, 'renard', '🦊 RENARD', 'Flairez si un loup est parmi 3 joueurs.', 'gold');
+        });
+        
+        // Joueur de Flûte
+        server.scheduleInTicks(1140, () => {
+            autoCallRole(server, 'joueur_flute', '🎵 JOUEUR DE FLÛTE', 'Charmez 2 joueurs cette nuit.', 'light_purple');
+        });
+        
+        // Corbeau
+        server.scheduleInTicks(1240, () => {
+            autoCallRole(server, 'corbeau', '🐦 CORBEAU', 'Accusez un joueur (+2 votes demain).', 'dark_gray');
+        });
+    }
+}
+
+// Appeler un rôle automatiquement
+function autoCallRole(server, roleTag, roleName, instruction, color) {
+    let hasRole = false;
+    
+    server.getPlayers().forEach(p => {
+        if (p.hasTag(roleTag) && !deadPlayers[p.name.string]) {
+            hasRole = true;
+            
+            // Titre dramatique
+            p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 10');
+            p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"' + instruction + '","color":"gray"}');
+            p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"' + roleName + ', réveillez-vous !","color":"' + color + '","bold":true}');
+            
+            p.tell('');
+            p.tell('§6§l════════════════════════════════════════════════');
+            p.tell('§e§l   ' + roleName + ', C\'EST VOTRE TOUR !');
+            p.tell('§6§l════════════════════════════════════════════════');
+            p.tell('');
+            p.tell('§7   ' + instruction);
+            p.tell('§7   Utilisez votre item sur un joueur.');
+            p.tell('');
+            
+            p.level.playSound(null, p.blockPosition(), 'minecraft:block.note_block.chime', 'players', 1.0, 1.2);
+        }
+    });
+    
+    // Message global dans le chat
+    if (hasRole) {
+        server.getPlayers().forEach(p => {
+            if (!p.hasTag(roleTag)) {
+                p.tell('§8[🌙] §7' + roleName + ' se réveille...');
+            }
+        });
+    }
+}
+
+// Appeler les loups (groupe)
+function autoCallLoups(server) {
+    let loupsList = [];
+    
+    server.getPlayers().forEach(p => {
+        if ((p.hasTag('loup_garou') || p.hasTag('loup_blanc') || p.hasTag('loup_alpha')) && !deadPlayers[p.name.string]) {
+            loupsList.push(p.name.string);
+            
+            p.server.runCommandSilent('title ' + p.name.string + ' times 10 60 10');
+            p.server.runCommandSilent('title ' + p.name.string + ' subtitle {"text":"Choisissez votre victime !","color":"gray"}');
+            p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🐺 LOUPS, RÉVEILLEZ-VOUS !","color":"red","bold":true}');
+            
+            p.tell('');
+            p.tell('§c§l🐺 ════════════════════════════════════════ 🐺');
+            p.tell('§c§l         LES LOUPS SE RÉVEILLENT !');
+            p.tell('§c§l🐺 ════════════════════════════════════════ 🐺');
+            p.tell('');
+            if (loupsList.length > 1) {
+                p.tell('§7   Vos alliés loups : §c' + loupsList.filter(n => n !== p.name.string).join(', '));
+            }
+            p.tell('§7   Cliquez droit avec un §cOS §7sur votre victime.');
+            p.tell('');
+            
+            p.level.playSound(null, p.blockPosition(), 'minecraft:entity.wolf.growl', 'players', 1.0, 0.8);
+        }
+    });
+    
+    // Message pour les autres
+    server.getPlayers().forEach(p => {
+        if (!p.hasTag('loup_garou') && !p.hasTag('loup_blanc') && !p.hasTag('loup_alpha')) {
+            p.tell('§8[🌙] §c🐺 Les loups-garous se réveillent...');
+        }
     });
 }
 
@@ -557,6 +689,8 @@ ServerEvents.tick(event => {
 // Stockage pour la révélation des cartes
 let pendingCardReveal = {}; // {joueur: role} en attente de clic
 let gameStarted = false;
+let hasMJ = false; // Si true, un MJ est présent et gère manuellement
+let autoNightPhase = 0; // Phase automatique de la nuit (0 = pas d'auto)
 
 // ============================================
 // 🎴 SYSTÈME DE DISTRIBUTION DES CARTES
@@ -1462,10 +1596,28 @@ ServerEvents.commandRegistry(event => {
                     .executes(ctx => {
                         const nbLoups = Arguments.INTEGER.getResult(ctx, 'loups');
                         const players = [];
+                        let mjPlayer = null;
                         
+                        // Détecter si un MJ est présent
                         ctx.source.level.players.forEach(p => {
-                            players.push(p);
+                            const title = playerTitles[p.name.string] || '';
+                            const isMJ = title.toLowerCase().includes('mj') || title.toLowerCase().includes('maitre');
+                            
+                            if (isMJ) {
+                                mjPlayer = p;
+                                hasMJ = true;
+                            } else {
+                                players.push(p);
+                            }
                         });
+                        
+                        // Si pas de MJ, le jeu sera automatique
+                        if (!mjPlayer) {
+                            hasMJ = false;
+                            ctx.source.player.tell('§6§l[La Meute] §a🤖 Mode automatique activé §7(pas de MJ détecté)');
+                        } else {
+                            ctx.source.player.tell('§6§l[La Meute] §e👑 ' + mjPlayer.name.string + ' §7est le Maître du Jeu');
+                        }
                         
                         if (players.length < 4) {
                             ctx.source.player.tell('§c[La Meute] §7Il faut au moins 4 joueurs pour commencer !');

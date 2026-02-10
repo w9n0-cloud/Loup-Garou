@@ -215,6 +215,33 @@ Le scoreboard affiche en permanence :
 
 ---
 
+## 🤖 MODE AUTOMATIQUE vs 👑 MODE MJ
+
+Le jeu détecte automatiquement si un **Maître du Jeu** est présent.
+
+### 👑 Avec un MJ (titre "MJ" ou "Maitre du Jeu")
+- Le MJ ne reçoit **pas de rôle**
+- Le MJ utilise les commandes `/lameute appel` pour appeler les rôles
+- Le MJ voit tous les messages de chat (nuit + morts)
+- Le MJ orchestre la partie manuellement
+
+### 🤖 Sans MJ (Mode Automatique)
+- Tous les joueurs reçoivent un rôle
+- **Annonces automatiques** pendant la nuit :
+  - "🐺 Loups, réveillez-vous !" → avec timer
+  - "👁 Voyante, réveillez-vous !" → automatique
+  - etc.
+- Messages dans le chat pour indiquer qui se réveille
+- Timer et transitions gérés automatiquement
+
+**Pour activer le mode MJ :**
+```
+/tab [votre_nom] MJ
+```
+Puis relancez une partie avec `/lameute start`.
+
+---
+
 ## 💡 ASTUCES
 
 - **S'accroupir + regarder en l'air** : Affiche votre rôle dans l'action bar
