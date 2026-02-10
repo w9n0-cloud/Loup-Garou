@@ -2410,38 +2410,36 @@ ServerEvents.commandRegistry(event => {
             .then(Commands.argument('joueur', Arguments.STRING.create(event))
                 .then(Commands.argument('titre', Arguments.GREEDY_STRING.create(event))
                     .executes(ctx => {
-                        const targetName = Arguments.STRING.getResult(ctx, 'joueur');
-                        const titre = Arguments.GREEDY_STRING.getResult(ctx, 'titre');
-                        
-                        // Chercher le joueur
-                        let targetPlayer = null;
-                        ctx.source.level.players.forEach(p => {
-                            if (p.name.string.toLowerCase() === targetName.toLowerCase()) {
-                                targetPlayer = p;
+                        try {
+                            const targetName = Arguments.STRING.getResult(ctx, 'joueur');
+                            const titre = Arguments.GREEDY_STRING.getResult(ctx, 'titre');
+                            // Chercher le joueur
+                            let targetPlayer = null;
+                            ctx.source.level.players.forEach(p => {
+                                if (p.name.string.toLowerCase() === targetName.toLowerCase()) {
+                                    targetPlayer = p;
+                                }
+                            });
+                            if (!targetPlayer) {
+                                ctx.source.player.tell('§c[Tab] §7Joueur "' + targetName + '" non trouvé !');
+                                return 0;
                             }
-                        });
-                        
-                        if (!targetPlayer) {
-                            ctx.source.player.tell('§c[Tab] §7Joueur "' + targetName + '" non trouvé !');
+                            // Sauvegarder le titre
+                            playerTitles[targetPlayer.name.string] = titre;
+                            // Mettre à jour l'affichage
+                            updatePlayerDisplayName(targetPlayer);
+                            const formattedTitle = getFormattedTitle(titre);
+                            ctx.source.player.tell('§a[Tab] §7Titre de §f' + targetPlayer.name.string + ' §7changé en : ' + formattedTitle);
+                            targetPlayer.tell('§a[Tab] §7Votre titre a été changé en : ' + formattedTitle);
+                            // Annoncer à tous
+                            ctx.source.level.players.forEach(p => {
+                                p.tell('§8[Tab] §f' + targetPlayer.name.string + ' §7est maintenant : ' + formattedTitle.trim());
+                            });
+                            return 1;
+                        } catch (e) {
+                            ctx.source.player.tell('§c[Tab] §7Erreur: ' + e + (e && e.stack ? ('\n' + e.stack) : ''));
                             return 0;
                         }
-                        
-                        // Sauvegarder le titre
-                        playerTitles[targetPlayer.name.string] = titre;
-                        
-                        // Mettre à jour l'affichage
-                        updatePlayerDisplayName(targetPlayer);
-                        
-                        const formattedTitle = getFormattedTitle(titre);
-                        ctx.source.player.tell('§a[Tab] §7Titre de §f' + targetPlayer.name.string + ' §7changé en : ' + formattedTitle);
-                        targetPlayer.tell('§a[Tab] §7Votre titre a été changé en : ' + formattedTitle);
-                        
-                        // Annoncer à tous
-                        ctx.source.level.players.forEach(p => {
-                            p.tell('§8[Tab] §f' + targetPlayer.name.string + ' §7est maintenant : ' + formattedTitle.trim());
-                        });
-                        
-                        return 1;
                     })
                 )
             )
