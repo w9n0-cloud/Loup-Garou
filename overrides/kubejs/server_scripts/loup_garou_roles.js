@@ -698,6 +698,64 @@ function revealRoleToPlayer(player, role) {
             player.give('minecraft:iron_sword');
             break;
     }
+    
+    // Donner le livre des règles personnalisé
+    giveRuleBook(player, role, roleName, roleDescription);
+}
+
+// ============================================
+// 📖 LIVRE DES RÈGLES PERSONNALISÉ
+// ============================================
+function giveRuleBook(player, role, roleName, roleDescription) {
+    // Déterminer l'équipe du joueur
+    let equipe = '§aVillage';
+    let objectif = 'Éliminez tous les Loups-Garous !';
+    
+    if (role === 'loup_garou' || role === 'loup_blanc' || role === 'loup_alpha' || role === 'infect') {
+        equipe = '§cLoups';
+        objectif = 'Dévorez tous les Villageois !';
+    } else if (role === 'ange' || role === 'joueur_flute') {
+        equipe = '§eSolitaire';
+        if (role === 'ange') objectif = 'Faites-vous éliminer au premier vote !';
+        if (role === 'joueur_flute') objectif = 'Charmez tous les joueurs vivants !';
+    }
+    
+    // Créer le livre via commande
+    let bookCommand = 'give ' + player.name.string + ' minecraft:written_book{';
+    bookCommand += 'title:"Livre de ' + roleName + '",';
+    bookCommand += 'author:"Maître du Jeu",';
+    bookCommand += 'pages:[';
+    
+    // Page 1 : Votre rôle
+    bookCommand += '\'{"text":"§l§6══ VOTRE RÔLE ══\\n\\n","extra":[';
+    bookCommand += '{"text":"§l' + roleName + '\\n\\n","color":"gold"},';
+    bookCommand += '{"text":"' + roleDescription + '\\n\\n","color":"gray"},';
+    bookCommand += '{"text":"Équipe: ' + equipe + '\\n","color":"white"},';
+    bookCommand += '{"text":"\\n§7Objectif:\\n","color":"white"},';
+    bookCommand += '{"text":"' + objectif + '","color":"yellow"}';
+    bookCommand += ']}\',';
+    
+    // Page 2 : Comment jouer
+    bookCommand += '\'{"text":"§l§6══ COMMENT JOUER ══\\n\\n","extra":[';
+    bookCommand += '{"text":"§lJour:\\n","color":"yellow"},';
+    bookCommand += '{"text":"• Discutez avec les autres\\n• Clic droit = Voter\\n• Clic gauche = Annuler\\n\\n","color":"gray"},';
+    bookCommand += '{"text":"§lNuit:\\n","color":"dark_purple"},';
+    bookCommand += '{"text":"• Utilisez vos items\\n• Chat = Message au MJ\\n• Attendez votre tour\\n","color":"gray"}';
+    bookCommand += ']}\',';
+    
+    // Page 3 : Commandes
+    bookCommand += '\'{"text":"§l§6══ RACCOURCIS ══\\n\\n","extra":[';
+    bookCommand += '{"text":"§lVoir votre rôle:\\n","color":"aqua"},';
+    bookCommand += '{"text":"Shift + Regarder en l air\\n\\n","color":"gray"},';
+    bookCommand += '{"text":"§lTimer:\\n","color":"aqua"},';
+    bookCommand += '{"text":"Barre XP = Temps restant\\n\\n","color":"gray"},';
+    bookCommand += '{"text":"§lScoreboard:\\n","color":"aqua"},';
+    bookCommand += '{"text":"Votre rôle à droite","color":"gray"}';
+    bookCommand += ']}\'';
+    
+    bookCommand += ']}';
+    
+    player.server.runCommandSilent(bookCommand);
 }
 
 // Événement pour cliquer et révéler la carte
@@ -732,6 +790,7 @@ PlayerEvents.rightClickedEmpty(event => {
 // Stockage des votes
 let votes = {};
 let votePhaseActive = false;
+let publicVotes = false; // Si true, les votes sont annoncés publiquement
 
 // Stockage des pouvoirs utilisés
 let voyantePowerUsed = {};      // {joueur: true} si déjà utilisé cette nuit
@@ -1179,11 +1238,23 @@ PlayerEvents.entityInteracted(event => {
         player.tell('§6[Vote] §aVous avez voté contre §c' + targetName);
         
         // Annoncer à tout le monde
-        player.level.players.forEach(p => {
-            if (p.name.string !== voterName) {
-                p.tell('§6[Vote] §e' + voterName + ' §7a voté !');
-            }
-        });
+        if (publicVotes) {
+            // Votes publics : tout le monde voit qui vote qui
+            player.level.players.forEach(p => {
+                p.tell('');
+                p.tell('§6§l══════════════════════════════════════════');
+                p.tell('§e§l   VILLAGEOIS DE THIERCELIEUX');
+                p.tell('§f   ' + voterName + ' §7a décidé de voter pour §c' + targetName);
+                p.tell('§6§l══════════════════════════════════════════');
+            });
+        } else {
+            // Votes anonymes : on sait juste que quelqu'un a voté
+            player.level.players.forEach(p => {
+                if (p.name.string !== voterName) {
+                    p.tell('§6[Vote] §e' + voterName + ' §7a voté !');
+                }
+            });
+        }
         
         // Son de vote
         player.level.playSound(null, player.blockPosition(), 
@@ -1720,6 +1791,28 @@ ServerEvents.commandRegistry(event => {
                     votes = {}; // Réinitialiser pour le prochain tour
                     return 1;
                 })
+            )
+            .then(Commands.literal('votes')
+                .then(Commands.literal('public')
+                    .executes(ctx => {
+                        publicVotes = true;
+                        ctx.source.level.players.forEach(p => {
+                            p.tell('§6§l[La Meute] §aLes votes sont maintenant §l§ePUBLICS');
+                            p.tell('§7  → Tout le monde verra qui vote pour qui');
+                        });
+                        return 1;
+                    })
+                )
+                .then(Commands.literal('anonyme')
+                    .executes(ctx => {
+                        publicVotes = false;
+                        ctx.source.level.players.forEach(p => {
+                            p.tell('§6§l[La Meute] §aLes votes sont maintenant §l§8ANONYMES');
+                            p.tell('§7  → Personne ne verra les votes avant le décompte');
+                        });
+                        return 1;
+                    })
+                )
             )
             .then(Commands.literal('hurlement')
                 .executes(ctx => {

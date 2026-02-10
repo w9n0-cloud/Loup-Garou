@@ -46,6 +46,34 @@ Joue un hurlement de loup pour l'ambiance.
 
 ---
 
+### `/lameute votes <mode>`
+Change le mode d'affichage des votes.
+
+| Mode | Description |
+|------|-------------|
+| `public` | Tout le monde voit qui vote pour qui en temps réel |
+| `anonyme` | Les votes restent secrets jusqu'au décompte (défaut) |
+
+**Votes publics - Annonce dans le chat :**
+```
+══════════════════════════════════════════
+   VILLAGEOIS DE THIERCELIEUX
+   [Joueur] a décidé de voter pour [Cible]
+══════════════════════════════════════════
+```
+
+---
+
+## 📖 LIVRE DES RÈGLES
+
+Chaque joueur reçoit automatiquement un **Livre des Règles** personnel contenant :
+- 📜 Son rôle et sa description
+- 🎯 Son équipe et son objectif
+- 🎮 Comment jouer (jour/nuit)
+- ⌨️ Les raccourcis utiles
+
+---
+
 ## 📢 APPEL DES RÔLES (Maître du Jeu)
 
 Pendant la nuit, le MJ peut appeler chaque rôle individuellement.
