@@ -1,11 +1,7 @@
-// 🐺 LA MEUTE - Client Scripts
-// Développé par w9n0
-
 ClientEvents.tick(event => {
 });
 
 ItemEvents.tooltip(event => {
-    // Lait = Antidote
     event.add('minecraft:milk_bucket', [
         '',
         '§a☤ Peut soigner une morsure de loup-garou',

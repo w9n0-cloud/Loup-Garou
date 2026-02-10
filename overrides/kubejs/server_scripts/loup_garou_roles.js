@@ -1,10 +1,3 @@
-// 🐺 LA MEUTE - Loup-Garou Minecraft
-// Développé par w9n0
-
-// ============================================
-// 🏷️ SYSTÈME DE TITRES
-// ============================================
-
 let playerTitles = {};
 let ancienLives = {};
 let idiotRevealed = {};
@@ -42,10 +35,6 @@ function updatePlayerDisplayName(player) {
     player.server.runCommandSilent('team modify title_' + playerName.replace(/[^a-zA-Z0-9]/g, '') + ' prefix ' + JSON.stringify({"text":formattedTitle.replace(/§/g, '\u00A7')}));
 }
 
-// ============================================
-// 📍 SYSTÈME D'ARÈNE
-// ============================================
-
 let arenaCenter = {
     x: 0,
     y: 100,
@@ -82,10 +71,6 @@ function teleportPlayersInCircle(server) {
     return count;
 }
 
-// ============================================
-// ⏰ SYSTÈME DE TIMER
-// ============================================
-
 let timerConfig = {
     dayDuration: 5,
     nightDuration: 6,
@@ -96,16 +81,10 @@ let timerConfig = {
     dayCount: 0
 };
 
-// ============================================
-// 👑 SYSTÈME DE MAIRE
-// ============================================
 let maire = null;
 let maireVoteActive = false;
 let maireVotes = {};
 
-// ============================================
-// ☠️ JOUEURS MORTS (Spectateurs)
-// ============================================
 let deadPlayers = {};
 
 let nightActionsCompleted = {
@@ -329,9 +308,6 @@ function transitionToNight(server) {
     }
 }
 
-// ============================================
-// 🤖 SYSTÈME DE NUIT AUTOMATIQUE (Sans MJ)
-// ============================================
 function runAutoNightSequence(server) {
     // Phase 1 : Cupidon (première nuit seulement)
     if (timerConfig.dayCount === 0) {
@@ -689,14 +665,9 @@ ServerEvents.tick(event => {
 // Stockage pour la révélation des cartes
 let pendingCardReveal = {}; // {joueur: role} en attente de clic
 let gameStarted = false;
-let hasMJ = false; // Si true, un MJ est présent et gère manuellement
-let autoNightPhase = 0; // Phase automatique de la nuit (0 = pas d'auto)
+let hasMJ = false;
+let autoNightPhase = 0;
 
-// ============================================
-// 🎴 SYSTÈME DE DISTRIBUTION DES CARTES
-// ============================================
-
-// Fonction pour mélanger un tableau
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -953,9 +924,6 @@ function revealRoleToPlayer(player, role) {
     giveRuleBook(player, role, roleName, roleDescription);
 }
 
-// ============================================
-// 📖 LIVRE DES RÈGLES PERSONNALISÉ
-// ============================================
 function giveRuleBook(player, role, roleName, roleDescription) {
     // Déterminer l'équipe du joueur
     let equipe = '§aVillage';
@@ -1049,12 +1017,9 @@ let sorcierePotionMort = {};    // {joueur: true} si potion encore dispo
 let salvateurProtection = {};   // {joueur: "cible"} dernière protection
 let cupidonLinks = {};          // {joueur1: joueur2, joueur2: joueur1}
 let chasseurCanShoot = {};      // {joueur: true} si peut encore tirer
-let loupVotes = {};             // {loup: "cible"} vote des loups
+let loupVotes = {};
 let nightPhaseActive = false;
 
-// ============================================
-// 🔮 VOYANTE - Clic droit avec Œil d'araignée
-// ============================================
 ItemEvents.rightClicked('minecraft:spider_eye', event => {
     const player = event.player;
     
@@ -1107,9 +1072,6 @@ ItemEvents.rightClicked('minecraft:spider_eye', event => {
     }
 });
 
-// ============================================
-// ⚗️ SORCIÈRE - Potion de Vie (Pomme dorée)
-// ============================================
 ItemEvents.rightClicked('minecraft:golden_apple', event => {
     const player = event.player;
     
@@ -1145,9 +1107,6 @@ ItemEvents.rightClicked('minecraft:golden_apple', event => {
     }
 });
 
-// ============================================
-// ⚗️ SORCIÈRE - Potion de Mort (Wither Rose)
-// ============================================
 ItemEvents.rightClicked('minecraft:wither_rose', event => {
     const player = event.player;
     
@@ -1183,9 +1142,6 @@ ItemEvents.rightClicked('minecraft:wither_rose', event => {
     }
 });
 
-// ============================================
-// 🛡️ SALVATEUR - Protection (Bouclier)
-// ============================================
 ItemEvents.rightClicked('minecraft:shield', event => {
     const player = event.player;
     
@@ -1220,9 +1176,6 @@ ItemEvents.rightClicked('minecraft:shield', event => {
     }
 });
 
-// ============================================
-// 💕 CUPIDON - Lier par l'amour (Rose)
-// ============================================
 let cupidonFirstChoice = {};
 
 ItemEvents.rightClicked('minecraft:poppy', event => {
@@ -1291,9 +1244,6 @@ ItemEvents.rightClicked('minecraft:poppy', event => {
     }
 });
 
-// ============================================
-// 🐺 LOUP-GAROU - Désigner victime (Os)
-// ============================================
 ItemEvents.rightClicked('minecraft:bone', event => {
     const player = event.player;
     
@@ -1344,9 +1294,6 @@ ItemEvents.rightClicked('minecraft:bone', event => {
     }
 });
 
-// ============================================
-// 🏹 CHASSEUR - Tirer (Arc)
-// ============================================
 ItemEvents.rightClicked('minecraft:bow', event => {
     const player = event.player;
     
@@ -1384,11 +1331,6 @@ ItemEvents.rightClicked('minecraft:bow', event => {
     }
 });
 
-// ============================================
-// ❓ VOIR SON RÔLE - S'accroupir + regarder en l'air
-// ============================================
-
-// Variable pour limiter les updates du scoreboard
 let lastScoreboardUpdate = {};
 
 PlayerEvents.tick(event => {
@@ -2630,9 +2572,6 @@ PlayerEvents.loggedIn(event => {
     player.tell('');
 });
 
-// ============================================
-// 💬 SYSTÈME DE CHAT AVEC TITRES
-// ============================================
 PlayerEvents.chat(event => {
     const player = event.player;
     const playerName = player.name.string;

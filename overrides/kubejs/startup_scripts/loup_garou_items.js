@@ -1,6 +1,3 @@
-// 🐺 LA MEUTE - Items
-// Développé par w9n0
-
 StartupEvents.registry('item', event => {
     event.create('lameute:carte_loup_garou')
         .displayName('§c§lCarte Loup-Garou')
