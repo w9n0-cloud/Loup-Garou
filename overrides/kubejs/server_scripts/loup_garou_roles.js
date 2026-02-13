@@ -2,6 +2,85 @@ let playerTitles = {};
 let ancienLives = {};
 let idiotRevealed = {};
 
+// Charger les titres sauvegardés au démarrage
+function loadPlayerTitles() {
+    try {
+        const file = java.io.File('kubejs/data/player_titles.json');
+        if (file.exists()) {
+            const content = java.nio.file.Files.readString(file.toPath());
+            playerTitles = JSON.parse(content);
+            console.log('[Tab] Titres chargés: ' + Object.keys(playerTitles).length + ' joueurs');
+        }
+    } catch (e) {
+        console.log('[Tab] Erreur lors du chargement des titres: ' + e);
+        playerTitles = {};
+    }
+}
+
+// Sauvegarder les titres
+function savePlayerTitles() {
+    try {
+        const file = java.io.File('kubejs/data/player_titles.json');
+        file.getParentFile().mkdirs();
+        java.nio.file.Files.writeString(file.toPath(), JSON.stringify(playerTitles, null, 2));
+        console.log('[Tab] Titres sauvegardés: ' + Object.keys(playerTitles).length + ' joueurs');
+    } catch (e) {
+        console.log('[Tab] Erreur lors de la sauvegarde des titres: ' + e);
+    }
+}
+
+// Configuration du jeu (Spawn, etc.)
+let gameConfig = {
+    spawnPoint: {
+        x: 0,
+        y: 100,
+        z: 0,
+        set: false,
+        radius: 5,
+        dimension: 'minecraft:overworld'
+    }
+};
+
+function loadGameConfig() {
+    try {
+        const file = java.io.File('kubejs/data/lameute_config.json');
+        if (file.exists()) {
+            const content = java.nio.file.Files.readString(file.toPath());
+            gameConfig = JSON.parse(content);
+            console.log('[La Meute] Configuration chargée');
+        }
+    } catch (e) {
+        console.log('[La Meute] Erreur chargement config: ' + e);
+    }
+}
+
+function saveGameConfig() {
+    try {
+        const file = java.io.File('kubejs/data/lameute_config.json');
+        file.getParentFile().mkdirs();
+        java.nio.file.Files.writeString(file.toPath(), JSON.stringify(gameConfig, null, 2));
+    } catch (e) {
+        console.log('[La Meute] Erreur sauvegarde config: ' + e);
+    }
+}
+
+// Charger les titres au démarrage
+ServerEvents.loaded(event => {
+    loadPlayerTitles();
+    loadGameConfig();
+});
+
+// Sauvegarder les titres quand le serveur s'arrête
+ServerEvents.unload(event => {
+    savePlayerTitles();
+    saveGameConfig();
+});
+
+// Sauvegarder aussi quand un joueur se déconnecte
+PlayerEvents.loggedOut(event => {
+    savePlayerTitles();
+});
+
 const titleColors = {
     'dev': '§b§l[DEV] ',
     'maitre du jeu': '§6§l[MJ] ',
@@ -28,22 +107,16 @@ function updatePlayerDisplayName(player) {
     const playerName = player.name.string;
     const title = playerTitles[playerName] || 'Joueur';
     const formattedTitle = getFormattedTitle(title);
-    const displayName = formattedTitle + '§f' + playerName;
-    player.displayName = displayName;
+    // On ne touche plus à player.displayName (inexistant côté serveur)
+    // On gère uniquement le préfixe via les teams pour le TAB
     player.server.runCommandSilent('team add title_' + playerName.replace(/[^a-zA-Z0-9]/g, '') + ' ""');
     player.server.runCommandSilent('team join title_' + playerName.replace(/[^a-zA-Z0-9]/g, '') + ' ' + playerName);
     player.server.runCommandSilent('team modify title_' + playerName.replace(/[^a-zA-Z0-9]/g, '') + ' prefix ' + JSON.stringify({"text":formattedTitle.replace(/§/g, '\u00A7')}));
 }
 
-let arenaCenter = {
-    x: 0,
-    y: 100,
-    z: 0,
-    set: false,
-    radius: 5
-};
-
 function teleportPlayersInCircle(server) {
+    if (!gameConfig.spawnPoint.set) return 0;
+
     let players = [];
     server.players.forEach(p => {
         if (p.hasTag('loupgarou_playing')) {
@@ -57,15 +130,16 @@ function teleportPlayersInCircle(server) {
     
     const count = players.length;
     const angleStep = (2 * Math.PI) / count;
+    const center = gameConfig.spawnPoint;
     
     players.forEach((player, index) => {
         const angle = angleStep * index;
-        const x = arenaCenter.x + Math.cos(angle) * arenaCenter.radius;
-        const z = arenaCenter.z + Math.sin(angle) * arenaCenter.radius;
-        const y = arenaCenter.y;
+        const x = center.x + Math.cos(angle) * center.radius;
+        const z = center.z + Math.sin(angle) * center.radius;
+        const y = center.y;
         
-        player.server.runCommandSilent('tp ' + player.name.string + ' ' + x.toFixed(1) + ' ' + y + ' ' + z.toFixed(1));
-        player.server.runCommandSilent('tp ' + player.name.string + ' ' + x.toFixed(1) + ' ' + y + ' ' + z.toFixed(1) + ' facing ' + arenaCenter.x + ' ' + y + ' ' + arenaCenter.z);
+        // Téléportation avec regard vers le centre
+        player.server.runCommandSilent('execute in ' + center.dimension + ' run tp ' + player.name.string + ' ' + x.toFixed(1) + ' ' + y + ' ' + z.toFixed(1) + ' facing ' + center.x + ' ' + y + ' ' + center.z);
     });
     
     return count;
@@ -84,10 +158,16 @@ let timerConfig = {
 let maire = null;
 let maireVoteActive = false;
 let maireVotes = {};
+let maireDeceased = null; // Stocke le pseudo du maire qui vient de mourir
 
 let deadPlayers = {};
 
 let sorciereNoireCurse = null; // Joueur maudit par la Sorcière Noire
+let corbeauTarget = null; // Cible du Corbeau (+2 votes)
+let loupAlphaUsed = false; // Pouvoir infection utilisé
+let renardPowerUsed = {}; // Si false, le renard a perdu son flair
+let fluteCharmed = {}; // Joueurs charmés par la flûte
+let fluteDailyCharm = {}; // Compteur journalier pour la flûte
 
 let nightActionsCompleted = {
     loups: false,
@@ -136,6 +216,7 @@ function transitionToDay(server) {
     votePhaseActive = true;
     nightPhaseActive = false;
     votes = {};
+    updateVoteScoreboard(server);
     
     // Exécuter l'attaque des loups-garous
     let loupTarget = null;
@@ -204,8 +285,48 @@ function transitionToDay(server) {
             
             // Mettre le mort en spectateur
             if (victimPlayer) {
+                // Gestion de la succession du Maire (Mort de nuit)
+                if (loupTarget === maire) {
+                    maireDeceased = maire;
+                    maire = null;
+                    server.runCommandSilent('tellraw @a ["",{"text":"[Maire] ","color":"gold","bold":true},{"text":"Le Maire est mort ! Il doit désigner son successeur !","color":"red"}]');
+                    victimPlayer.tell('§e§l[Maire] §fUtilisez §6/lameute successeur <joueur> §fpour nommer le nouveau Maire.');
+                }
+
+                // Gestion du Chevalier (Mort de nuit)
+                if (victimPlayer.hasTag('chevalier') && !victimProtected) {
+                    const wolves = server.getPlayers().filter(p => (p.hasTag('loup_garou') || p.hasTag('loup_blanc') || p.hasTag('loup_alpha')) && !deadPlayers[p.name.string]);
+                    if (wolves.length > 0) {
+                        const randomWolf = wolves[Math.floor(Math.random() * wolves.length)];
+                        randomWolf.kill();
+                        deadPlayers[randomWolf.name.string] = true;
+                        randomWolf.server.runCommandSilent('gamemode spectator ' + randomWolf.name.string);
+                        server.runCommandSilent('tellraw @a ["",{"text":"⚔ Le Chevalier a emporté ","color":"blue"},{"text":"' + randomWolf.name.string + '","color":"red","bold":true},{"text":" dans sa tombe !","color":"blue"}]');
+                    }
+                }
+
                 deadPlayers[loupTarget] = true;
-                victimPlayer.server.runCommandSilent('gamemode spectator ' + loupTarget);
+                
+                // Gestion du Chasseur (Mort de nuit - 30s pour tirer)
+                if (victimPlayer.hasTag('chasseur')) {
+                    victimPlayer.addTag('chasseur_mort');
+                    chasseurCanShoot[loupTarget] = true;
+                    victimPlayer.server.runCommandSilent('gamemode adventure ' + loupTarget);
+                    victimPlayer.tell('§6§l[Chasseur] §cVous êtes mort... Mais vous avez 30 secondes pour tirer une dernière flèche !');
+                    
+                    // Timer 30s
+                    server.scheduleInTicks(600, () => {
+                        if (victimPlayer.hasTag('chasseur_mort')) {
+                            victimPlayer.removeTag('chasseur_mort');
+                            chasseurCanShoot[loupTarget] = false;
+                            victimPlayer.server.runCommandSilent('gamemode spectator ' + loupTarget);
+                            victimPlayer.tell('§c[Chasseur] §7Le temps est écoulé. Vous rejoignez les esprits.');
+                        }
+                    });
+                } else {
+                    victimPlayer.server.runCommandSilent('gamemode spectator ' + loupTarget);
+                }
+                
                 victimPlayer.tell('');
                 victimPlayer.tell('§4§l════════════════════════════════════════════════');
                 victimPlayer.tell('§c§l           ☠ VOUS ÊTES MORT(E) ☠');
@@ -272,11 +393,14 @@ function transitionToNight(server) {
     timerConfig.timerStartTime = Date.now();
     votePhaseActive = false;
     nightPhaseActive = true;
+    clearVoteScoreboard(server);
     
     // Réinitialiser les actions de nuit
     resetNightActions();
     voyantePowerUsed = {};
     loupVotes = {};
+    corbeauTarget = null;
+    fluteDailyCharm = {};
     
     // Retirer les protections de la nuit dernière
     server.getPlayers().forEach(p => {
@@ -457,6 +581,12 @@ function executeVoteResult(server) {
         voteCount[target] = (voteCount[target] || 0) + voteWeight;
     }
     
+    // Ajouter les votes du Corbeau
+    if (corbeauTarget) {
+        voteCount[corbeauTarget] = (voteCount[corbeauTarget] || 0) + 2;
+        server.runCommandSilent('tellraw @a ["",{"text":"[Corbeau] ","color":"dark_gray","bold":true},{"text":"Une malédiction pèse sur ","color":"gray"},{"text":"' + corbeauTarget + '","color":"red"},{"text":" (+2 votes)","color":"gray"}]');
+    }
+
     // Trouver le joueur le plus voté
     let maxVotes = 0;
     let eliminated = null;
@@ -533,6 +663,16 @@ function executeVoteResult(server) {
         } else if (eliminated && !maireVoteActive) {
             p.tell('§4§l  ☠ ' + eliminated + ' est éliminé avec ' + maxVotes + ' vote(s) !');
             
+            // Gestion de la succession du Maire (Mort de jour)
+            if (eliminated === maire) {
+                maireDeceased = maire;
+                maire = null;
+                p.tell('§6§l[Maire] §cLe Maire est mort ! Il doit désigner son successeur !');
+                if (eliminatedPlayer) {
+                    eliminatedPlayer.tell('§e§l[Maire] §fUtilisez §6/lameute successeur <joueur> §fpour nommer le nouveau Maire.');
+                }
+            }
+
             // Révéler le rôle
             let role = 'Villageois';
             if (eliminatedPlayer) {
@@ -569,11 +709,51 @@ function executeVoteResult(server) {
         p.level.playSound(null, p.blockPosition(),
             'minecraft:entity.lightning_bolt.thunder', 'players', 0.5, 0.8);
     });
+
+    // Vérifier victoire de l'Ange
+    if (eliminatedPlayer && eliminatedPlayer.hasTag('ange') && timerConfig.dayCount <= 1) {
+        server.scheduleInTicks(60, () => {
+            server.getPlayers().forEach(p => {
+                p.tell('');
+                p.tell('§b§l════════════════════════════════════════════════════════');
+                p.tell('');
+                p.tell('§b§l          😇 L\'ANGE A GAGNÉ ! 😇');
+                p.tell('');
+                p.tell('§7  Il a réussi à se faire éliminer au premier jour.');
+                p.tell('');
+                p.tell('§b§l════════════════════════════════════════════════════════');
+                
+                p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"😇 L\'ANGE GAGNE 😇","color":"aqua","bold":true}');
+                p.level.playSound(null, p.blockPosition(), 'minecraft:ui.toast.challenge_complete', 'players', 1.0, 1.0);
+            });
+            gameStarted = false;
+        });
+        // L'ange ne meurt pas vraiment (il gagne), mais on le laisse en spectateur pour la fin
+    }
     
     // Mettre en spectateur si ce n'est pas l'idiot et pas l'élection du maire
     if (eliminatedPlayer && !isIdiotSave && !maireVoteActive) {
         deadPlayers[eliminated] = true;
-        server.runCommandSilent('gamemode spectator ' + eliminated);
+        
+        // Gestion du Chasseur (Mort de jour - 30s pour tirer)
+        if (eliminatedPlayer.hasTag('chasseur')) {
+            eliminatedPlayer.addTag('chasseur_mort');
+            chasseurCanShoot[eliminated] = true;
+            server.runCommandSilent('gamemode adventure ' + eliminated);
+            eliminatedPlayer.tell('§6§l[Chasseur] §cVous êtes mort... Mais vous avez 30 secondes pour tirer une dernière flèche !');
+            
+            // Timer 30s
+            server.scheduleInTicks(600, () => {
+                if (eliminatedPlayer.hasTag('chasseur_mort')) {
+                    eliminatedPlayer.removeTag('chasseur_mort');
+                    chasseurCanShoot[eliminated] = false;
+                    server.runCommandSilent('gamemode spectator ' + eliminated);
+                    eliminatedPlayer.tell('§c[Chasseur] §7Le temps est écoulé. Vous rejoignez les esprits.');
+                }
+            });
+        } else {
+            server.runCommandSilent('gamemode spectator ' + eliminated);
+        }
         
         // Vérifier si la Sorcière Noire gagne (victime = joueur maudit)
         if (sorciereNoireCurse && eliminated === sorciereNoireCurse) {
@@ -1057,7 +1237,7 @@ ItemEvents.rightClicked('minecraft:spider_eye', event => {
     
     // Trouver le joueur regardé
     const lookingAt = player.rayTrace(5, true);
-    if (lookingAt && lookingAt.entity && lookingAt.entity.type === 'minecraft:player') {
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
         const target = lookingAt.entity;
         const targetName = target.name.string;
         
@@ -1106,7 +1286,7 @@ ItemEvents.rightClicked('minecraft:golden_apple', event => {
     }
     
     const lookingAt = player.rayTrace(5, true);
-    if (lookingAt && lookingAt.entity && lookingAt.entity.type === 'minecraft:player') {
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
         const target = lookingAt.entity;
         
         target.heal(20);
@@ -1141,7 +1321,7 @@ ItemEvents.rightClicked('minecraft:wither_rose', event => {
     }
     
     const lookingAt = player.rayTrace(5, true);
-    if (lookingAt && lookingAt.entity && lookingAt.entity.type === 'minecraft:player') {
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
         const target = lookingAt.entity;
         
         target.kill();
@@ -1171,7 +1351,7 @@ ItemEvents.rightClicked('minecraft:shield', event => {
     }
     
     const lookingAt = player.rayTrace(5, true);
-    if (lookingAt && lookingAt.entity && lookingAt.entity.type === 'minecraft:player') {
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
         const target = lookingAt.entity;
         const targetName = target.name.string;
         
@@ -1208,7 +1388,7 @@ ItemEvents.rightClicked('minecraft:poppy', event => {
     }
     
     const lookingAt = player.rayTrace(5, true);
-    if (lookingAt && lookingAt.entity && lookingAt.entity.type === 'minecraft:player') {
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
         const target = lookingAt.entity;
         const targetName = target.name.string;
         
@@ -1265,7 +1445,8 @@ ItemEvents.rightClicked('minecraft:poppy', event => {
 ItemEvents.rightClicked('minecraft:bone', event => {
     const player = event.player;
     
-    if (!player.hasTag('loup_garou')) return;
+    // Correction : Autoriser tous les types de loups à voter
+    if (!player.hasTag('loup_garou') && !player.hasTag('loup_blanc') && !player.hasTag('loup_alpha')) return;
     
     if (!nightPhaseActive) {
         player.tell('§c[Loup-Garou] §7Les loups ne chassent que la nuit...');
@@ -1273,12 +1454,12 @@ ItemEvents.rightClicked('minecraft:bone', event => {
     }
     
     const lookingAt = player.rayTrace(5, true);
-    if (lookingAt && lookingAt.entity && lookingAt.entity.type === 'minecraft:player') {
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
         const target = lookingAt.entity;
         const targetName = target.name.string;
         
         // Ne peut pas cibler un autre loup
-        if (target.hasTag('loup_garou')) {
+        if (target.hasTag('loup_garou') || target.hasTag('loup_blanc') || target.hasTag('loup_alpha') || target.hasTag('infect')) {
             player.tell('§c[Loup-Garou] §7Vous ne pouvez pas dévorer un membre de la meute !');
             return;
         }
@@ -1291,7 +1472,7 @@ ItemEvents.rightClicked('minecraft:bone', event => {
         let nbLoupsVoted = Object.keys(loupVotes).length;
         
         player.level.players.forEach(p => {
-            if (p.hasTag('loup_garou')) nbLoups++;
+            if (p.hasTag('loup_garou') || p.hasTag('loup_blanc') || p.hasTag('loup_alpha')) nbLoups++;
         });
         
         if (nbLoupsVoted >= nbLoups) {
@@ -1300,7 +1481,7 @@ ItemEvents.rightClicked('minecraft:bone', event => {
         
         // Notifier les autres loups
         player.level.players.forEach(p => {
-            if (p.hasTag('loup_garou')) {
+            if (p.hasTag('loup_garou') || p.hasTag('loup_blanc') || p.hasTag('loup_alpha')) {
                 p.tell('§c[Meute] §e' + player.name.string + ' §7veut dévorer §c' + targetName);
             }
         });
@@ -1329,11 +1510,13 @@ ItemEvents.rightClicked('minecraft:bow', event => {
     }
     
     const lookingAt = player.rayTrace(50, true);
-    if (lookingAt && lookingAt.entity && lookingAt.entity.type === 'minecraft:player') {
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
         const target = lookingAt.entity;
         
         target.kill();
         chasseurCanShoot[player.name.string] = false;
+        player.removeTag('chasseur_mort');
+        player.server.runCommandSilent('gamemode spectator ' + player.name.string);
         
         player.level.players.forEach(p => {
             p.tell('§6§l═══════════════════════════════════════════');
@@ -1360,7 +1543,7 @@ ItemEvents.rightClicked('minecraft:ink_sac', event => {
     }
     
     const lookingAt = player.rayTrace(10, true);
-    if (lookingAt && lookingAt.entity && lookingAt.entity.type === 'minecraft:player') {
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
         const target = lookingAt.entity;
         const targetName = target.name.string;
         
@@ -1392,6 +1575,281 @@ ItemEvents.rightClicked('minecraft:ink_sac', event => {
         player.server.runCommandSilent('title ' + player.name.string + ' title {"text":"🖤 MALÉDICTION 🖤","color":"black","bold":true}');
     } else {
         player.tell('§0[Sorcière Noire] §7Regardez un joueur pour le maudire.');
+    }
+});
+
+// Pouvoir du Loup Blanc (Poudre d'os)
+ItemEvents.rightClicked('minecraft:bone_meal', event => {
+    const player = event.player;
+    if (!player.hasTag('loup_blanc')) return;
+    if (!nightPhaseActive) return;
+
+    // Disponible une nuit sur deux (Nuit 2, 4, 6...) -> DayCount impair (car start=0, nuit 1=0)
+    // DayCount 0 (Nuit 1) -> Non
+    // DayCount 1 (Nuit 2) -> Oui
+    if (timerConfig.dayCount % 2 === 0) {
+        player.tell('§f[Loup Blanc] §7Vous ne pouvez tuer un loup qu\'une nuit sur deux (Nuits paires).');
+        return;
+    }
+
+    const lookingAt = player.rayTrace(5, true);
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
+        const target = lookingAt.entity;
+        if (target.hasTag('loup_garou') || target.hasTag('loup_alpha')) {
+            target.kill();
+            player.tell('§f[Loup Blanc] §cVous avez éliminé le loup ' + target.name.string);
+            event.item.count--;
+        } else {
+            player.tell('§f[Loup Blanc] §7Ce n\'est pas un loup (ou c\'est un autre Loup Blanc).');
+        }
+    }
+});
+
+// Pouvoir du Loup Alpha (Infection)
+ItemEvents.rightClicked('minecraft:poisonous_potato', event => {
+    const player = event.player;
+    if (!player.hasTag('loup_alpha')) return;
+    if (!nightPhaseActive) return;
+    if (loupAlphaUsed) {
+        player.tell('§4[Loup Alpha] §7Vous avez déjà utilisé votre infection.');
+        return;
+    }
+
+    const lookingAt = player.rayTrace(5, true);
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
+        const target = lookingAt.entity;
+        if (target.hasTag('loup_garou') || target.hasTag('loup_blanc')) {
+            player.tell('§4[Loup Alpha] §7C\'est déjà un loup.');
+            return;
+        }
+
+        // Infecter
+        target.addTag('infect');
+        target.tell('§4§l☣ VOUS AVEZ ÉTÉ INFECTÉ ! ☣');
+        target.tell('§cVous gardez votre rôle apparent, mais vous gagnez désormais avec les Loups.');
+        player.tell('§4[Loup Alpha] §aVous avez infecté ' + target.name.string);
+        
+        loupAlphaUsed = true;
+        event.item.count--;
+    }
+});
+
+// Pouvoir du Renard (Carotte)
+ItemEvents.rightClicked('minecraft:carrot', event => {
+    const player = event.player;
+    if (!player.hasTag('renard')) return;
+    if (!nightPhaseActive) return;
+    if (renardPowerUsed[player.name.string] === false) {
+        player.tell('§6[Renard] §7Vous avez perdu votre flair.');
+        return;
+    }
+
+    const lookingAt = player.rayTrace(5, true);
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
+        const target = lookingAt.entity;
+        // Trouver les voisins (simulé par proximité dans la liste des joueurs ou rayon)
+        // Ici on prend le joueur visé + 2 aléatoires proches ou juste le visé pour simplifier
+        // Simplification : Le Renard flaire le joueur visé. Si c'est un loup, il garde son pouvoir. Sinon il le perd.
+        // Règle officielle : Le renard désigne 3 joueurs.
+        
+        let isWolfAround = false;
+        if (target.hasTag('loup_garou') || target.hasTag('loup_blanc') || target.hasTag('loup_alpha')) isWolfAround = true;
+        
+        if (isWolfAround) {
+            player.tell('§6[Renard] §aIl y a un loup parmi les joueurs ciblés ! (Flair conservé)');
+            player.level.playSound(null, player.blockPosition(), 'minecraft:entity.fox.screech', 'players', 1.0, 1.0);
+        } else {
+            player.tell('§6[Renard] §cIl n\'y a aucun loup ici... Vous perdez votre flair.');
+            renardPowerUsed[player.name.string] = false;
+            event.item.count--; // Perd la carotte
+        }
+    }
+});
+
+// Pouvoir du Corbeau (Plume)
+ItemEvents.rightClicked('minecraft:feather', event => {
+    const player = event.player;
+    if (!player.hasTag('corbeau')) return; // Attention : Idiot a aussi une plume
+    if (!nightPhaseActive) return;
+    
+    if (corbeauTarget) {
+        player.tell('§8[Corbeau] §7Vous avez déjà désigné votre cible.');
+        return;
+    }
+
+    const lookingAt = player.rayTrace(5, true);
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
+        const target = lookingAt.entity;
+        corbeauTarget = target.name.string;
+        player.tell('§8[Corbeau] §7Vous avez maudit §c' + corbeauTarget + '§7 (+2 votes demain).');
+        player.level.playSound(null, player.blockPosition(), 'minecraft:entity.phantom.flap', 'players', 1.0, 0.8);
+    }
+});
+
+// Pouvoir du Joueur de Flûte (Bâton)
+ItemEvents.rightClicked('minecraft:stick', event => {
+    const player = event.player;
+    if (!player.hasTag('joueur_flute')) return;
+    if (!nightPhaseActive) return;
+
+    const playerName = player.name.string;
+    if (!fluteDailyCharm[playerName]) fluteDailyCharm[playerName] = 0;
+    
+    if (fluteDailyCharm[playerName] >= 2) {
+        player.tell('§d[Flûte] §7Vous avez déjà charmé 2 personnes cette nuit.');
+        return;
+    }
+
+    const lookingAt = player.rayTrace(5, true);
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
+        const target = lookingAt.entity;
+        const targetName = target.name.string;
+
+        if (fluteCharmed[targetName]) {
+            player.tell('§d[Flûte] §7Ce joueur est déjà charmé.');
+            return;
+        }
+
+        fluteCharmed[targetName] = true;
+        fluteDailyCharm[playerName]++;
+        
+        player.tell('§d[Flûte] §aVous avez charmé ' + targetName);
+        target.tell('§d§l🎵 Une mélodie envoûtante résonne dans votre tête... Vous êtes charmé !');
+        
+        // Vérifier victoire
+        let allCharmed = true;
+        let alivePlayers = 0;
+        player.server.players.forEach(p => {
+            if (!deadPlayers[p.name.string] && !p.hasTag('joueur_flute')) {
+                alivePlayers++;
+                if (!fluteCharmed[p.name.string]) allCharmed = false;
+            }
+        });
+
+        if (allCharmed && alivePlayers > 0) {
+             player.server.scheduleInTicks(40, () => {
+                player.server.players.forEach(p => {
+                    p.tell('');
+                    p.tell('§d§l════════════════════════════════════════════════════════');
+                    p.tell('§d§l       🎵 LE JOUEUR DE FLÛTE A GAGNÉ ! 🎵');
+                    p.tell('§7  Tout le village danse sous son emprise...');
+                    p.tell('§d§l════════════════════════════════════════════════════════');
+                    
+                    p.server.runCommandSilent('title ' + p.name.string + ' title {"text":"🎵 VICTOIRE FLÛTE 🎵","color":"light_purple","bold":true}');
+                    p.level.playSound(null, p.blockPosition(), 'minecraft:block.note_block.flute', 'players', 1.0, 1.0);
+                });
+                gameStarted = false;
+            });
+        }
+    }
+});
+
+// ============================================
+// 🗳️ SYSTÈME DE VOTE PAR CLIC
+// ============================================
+
+// Fonction pour mettre à jour l'affichage des votes (Scoreboard sous le pseudo)
+function updateVoteScoreboard(server) {
+    // Créer l'objectif si nécessaire et l'afficher sous le pseudo
+    server.runCommandSilent('scoreboard objectives add vote_count dummy {"text":"§cVotes"}');
+    server.runCommandSilent('scoreboard objectives setdisplay belowName vote_count');
+    
+    // Reset des scores pour éviter les fantômes
+    server.runCommandSilent('scoreboard players reset * vote_count');
+    
+    // Calculer les votes
+    let counts = {};
+    for (let voter in votes) {
+        let target = votes[voter];
+        let weight = (voter === maire) ? 2 : 1;
+        counts[target] = (counts[target] || 0) + weight;
+    }
+    
+    // Appliquer les scores
+    for (let target in counts) {
+        server.runCommandSilent('scoreboard players set ' + target + ' vote_count ' + counts[target]);
+    }
+}
+
+function clearVoteScoreboard(server) {
+    server.runCommandSilent('scoreboard objectives remove vote_count');
+}
+
+// Clic Droit = VOTER (Via RayTrace pour compatibilité 1.20.1)
+ItemEvents.rightClicked(event => {
+    if (event.hand !== 'MAIN_HAND') return;
+    if (!votePhaseActive) return; // Optimisation
+
+    const player = event.player;
+    
+    // Utiliser le RayTrace pour détecter le joueur visé (plus fiable que entityInteracted)
+    const lookingAt = player.rayTrace(5, true);
+    
+    if (lookingAt && lookingAt.entity && lookingAt.entity.isPlayer()) {
+        const target = lookingAt.entity;
+        
+        // Vérifier si le joueur est vivant
+        if (deadPlayers[player.name.string]) {
+            // Exception pour le Chasseur mort qui tire (évite le message "Les morts ne votent pas")
+            if (player.hasTag('chasseur_mort') && player.mainHandItem.id === 'minecraft:bow') {
+                return;
+            }
+
+            player.tell('§c[Spectateur] §7Les morts ne votent pas !');
+            event.cancel();
+            return;
+        }
+        
+        // Vérifier si la cible est vivante
+        if (deadPlayers[target.name.string]) {
+            player.tell('§cVous ne pouvez pas voter pour un mort.');
+            event.cancel();
+            return;
+        }
+        
+        // Enregistrer le vote
+        votes[player.name.string] = target.name.string;
+        player.tell('§aA Voté pour : §e' + target.name.string);
+        player.playSound('minecraft:ui.button.click');
+        updateVoteScoreboard(event.server);
+        
+        // Annonce publique si activée
+        if (publicVotes) {
+            event.server.players.forEach(p => {
+                p.tell('§7' + player.name.string + ' a voté pour §c' + target.name.string);
+            });
+        }
+        
+        // Empêcher l'utilisation de l'item en main
+        event.cancel();
+    }
+});
+
+ // Gestion des coups (PVP DÉSACTIVÉ + Annulation de vote)
+EntityEvents.hurt(event => {
+    // Vérifier si c'est un joueur qui tape un joueur
+    if (event.entity.isPlayer() && event.source.actual && event.source.actual.isPlayer()) {
+        const attacker = event.source.actual;
+        
+        // Si on est en phase de vote, le coup sert à annuler le vote
+        if (votePhaseActive && votes[attacker.name.string]) {
+            delete votes[attacker.name.string];
+            attacker.tell('§eVote annulé.');
+            attacker.playSound('minecraft:ui.button.click');
+            updateVoteScoreboard(event.server);
+        }
+        
+        // DANS TOUS LES CAS : Pas de dégâts entre joueurs (C'est un jeu de société !)
+        event.cancel();
+    }
+});
+
+// Désactiver la faim (Mode Plateau)
+PlayerEvents.tick(event => {
+    const player = event.player;
+    if (player.foodLevel < 20) {
+        player.foodLevel = 20;
+        player.saturation = 20;
     }
 });
 
@@ -1476,6 +1934,21 @@ PlayerEvents.tick(event => {
     const player = event.player;
     const level = player.level;
     
+    // Particules de couronne pour le Maire
+    if (maire && player.name.string === maire) {
+        const now = Date.now();
+        const radius = 0.35;
+        const y = player.y + 2.2; // Au-dessus de la tête
+        
+        // 3 particules dorées qui tournent autour de la tête
+        for (let i = 0; i < 3; i++) {
+            const angle = ((now % 2000) / 2000.0) * Math.PI * 2 + (i * (Math.PI * 2 / 3));
+            const x = player.x + Math.cos(angle) * radius;
+            const z = player.z + Math.sin(angle) * radius;
+            level.spawnParticles('minecraft:wax_on', x, y, z, 1, 0, 0, 0, 0);
+        }
+    }
+    
     // Vérifier si c'est la nuit
     const timeOfDay = level.getDayTime() % 24000;
     const isNight = timeOfDay >= 13000 && timeOfDay <= 23000;
@@ -1500,6 +1973,60 @@ PlayerEvents.tick(event => {
                 player.tell('§c§oVous sentez une présence menaçante dans la nuit...');
             }
         }
+    }
+});
+
+// Chat privé des loups la nuit
+PlayerEvents.chat(event => {
+    const player = event.player;
+    const playerName = player.name.string;
+    
+    // Chat des morts (Spectateurs)
+    if (deadPlayers[playerName]) {
+        event.cancel();
+        const deadMessage = '§7[☠ Spectre] ' + playerName + ' §8» §7' + event.message;
+        
+        event.server.players.forEach(p => {
+            const pName = p.name.string;
+            const isMJ = playerTitles[pName] && (playerTitles[pName].toLowerCase().includes('mj') || playerTitles[pName].toLowerCase().includes('maitre'));
+            
+            // Envoyer aux morts et au MJ
+            if (deadPlayers[pName] || isMJ) {
+                p.tell(deadMessage);
+            }
+        });
+        return;
+    }
+    
+    // Si c'est la nuit, que le joueur est un loup et qu'il est vivant
+    if (nightPhaseActive && !deadPlayers[playerName] && (player.hasTag('loup_garou') || player.hasTag('loup_blanc') || player.hasTag('loup_alpha') || player.hasTag('infect'))) {
+        // Annuler le message public (personne d'autre ne le verra)
+        event.cancel();
+        
+        const message = event.message;
+        const wolfMessage = '§c[Meute] §7' + playerName + ' §8» §c' + message;
+        
+        // Brouillage pour la Petite Fille (remplace ~30% des lettres par des points)
+        let scrambled = '';
+        for (let i = 0; i < message.length; i++) {
+            if (message[i] === ' ') scrambled += ' ';
+            else scrambled += (Math.random() < 0.3) ? '.' : message[i];
+        }
+        const pfMessage = '§c[Meute] §7Loup-Garou §8» §c' + scrambled;
+        
+        // Envoyer à tous les loups, au MJ et à la Petite Fille
+        event.server.players.forEach(p => {
+            const pName = p.name.string;
+            const isWolf = p.hasTag('loup_garou') || p.hasTag('loup_blanc') || p.hasTag('loup_alpha') || p.hasTag('infect');
+            const isMJ = playerTitles[pName] && (playerTitles[pName].toLowerCase().includes('mj') || playerTitles[pName].toLowerCase().includes('maitre'));
+            const isPetiteFille = p.hasTag('petite_fille') && !deadPlayers[pName];
+            
+            if (isWolf || isMJ) {
+                p.tell(wolfMessage);
+            } else if (isPetiteFille) {
+                p.tell(pfMessage);
+            }
+        });
     }
 });
 
@@ -1652,6 +2179,12 @@ ServerEvents.commandRegistry(event => {
                                 'minecraft:entity.ender_dragon.growl', 'ambient', 0.3, 0.5);
                         });
                         
+                        // Téléportation automatique au spawn si défini
+                        if (gameConfig.spawnPoint.set) {
+                            teleportPlayersInCircle(ctx.source.server);
+                            ctx.source.player.tell('§a[La Meute] §7Téléportation des joueurs au point de spawn...');
+                        }
+
                         // Distribution des cartes avec délai
                         gameStarted = true;
                         ancienLives = {};
@@ -1668,6 +2201,10 @@ ServerEvents.commandRegistry(event => {
                         votes = {};
                         publicVotes = false;
                         sorciereNoireCurse = null;
+                        corbeauTarget = null;
+                        loupAlphaUsed = false;
+                        renardPowerUsed = {};
+                        fluteCharmed = {};
                         
                         // Mettre tout le monde en survival
                         ctx.source.level.players.forEach(p => {
@@ -1807,64 +2344,55 @@ ServerEvents.commandRegistry(event => {
             )
     );
     
-    // Commandes d'arène
+    // Commandes de Spawn / Point
     event.register(
         Commands.literal('lameute')
             .requires(requiresOP)
-            .then(Commands.literal('arene')
-                .then(Commands.literal('set')
-                    .executes(ctx => {
-                        const player = ctx.source.player;
-                        arenaCenter.x = Math.floor(player.x);
-                        arenaCenter.y = Math.floor(player.y);
-                        arenaCenter.z = Math.floor(player.z);
-                        arenaCenter.set = true;
-                        
-                        player.tell('§a[Arène] §7Centre défini à §e' + arenaCenter.x + ' ' + arenaCenter.y + ' ' + arenaCenter.z);
-                        player.tell('§7Utilisez §e/lameute arene rayon <nombre> §7pour modifier le rayon (défaut: 5)');
-                        return 1;
-                    })
-                )
+            .then(Commands.literal('point')
+                .executes(ctx => {
+                    const player = ctx.source.player;
+                    gameConfig.spawnPoint = {
+                        x: Math.floor(player.x),
+                        y: Math.floor(player.y),
+                        z: Math.floor(player.z),
+                        set: true,
+                        radius: gameConfig.spawnPoint.radius || 5,
+                        dimension: player.level.dimension.toString()
+                    };
+                    saveGameConfig();
+                    
+                    player.tell('§a[La Meute] §7Point de spawn défini en §e' + gameConfig.spawnPoint.x + ' ' + gameConfig.spawnPoint.y + ' ' + gameConfig.spawnPoint.z);
+                    return 1;
+                })
                 .then(Commands.literal('rayon')
                     .then(Commands.argument('size', Arguments.INTEGER.create(event))
                         .executes(ctx => {
                             const size = Arguments.INTEGER.getResult(ctx, 'size');
-                            arenaCenter.radius = Math.max(2, Math.min(size, 20));
-                            ctx.source.player.tell('§a[Arène] §7Rayon du cercle : §e' + arenaCenter.radius + ' blocs');
+                            gameConfig.spawnPoint.radius = Math.max(2, Math.min(size, 20));
+                            saveGameConfig();
+                            ctx.source.player.tell('§a[La Meute] §7Rayon du spawn : §e' + gameConfig.spawnPoint.radius + ' blocs');
                             return 1;
                         })
                     )
                 )
-                .then(Commands.literal('tp')
+            )
+            .then(Commands.literal('spawn')
                     .executes(ctx => {
-                        if (!arenaCenter.set) {
-                            ctx.source.player.tell('§c[Arène] §7Aucune arène définie ! Utilisez §e/lameute arene set');
+                        if (!gameConfig.spawnPoint.set) {
+                            ctx.source.player.tell('§c[La Meute] §7Aucun point de spawn défini ! Utilisez §e/lameute point');
                             return 0;
                         }
                         
                         const count = teleportPlayersInCircle(ctx.source.server);
                         
                         ctx.source.level.players.forEach(p => {
-                            p.tell('§a[Arène] §7Téléportation en cercle ! §e' + count + ' joueurs');
+                            p.tell('§a[La Meute] §7Téléportation au spawn ! §e' + count + ' joueurs');
                             p.level.playSound(null, p.blockPosition(), 
                                 'minecraft:entity.enderman.teleport', 'players', 1.0, 1.0);
                         });
                         
                         return 1;
                     })
-                )
-                .then(Commands.literal('info')
-                    .executes(ctx => {
-                        if (!arenaCenter.set) {
-                            ctx.source.player.tell('§c[Arène] §7Aucune arène définie !');
-                            return 0;
-                        }
-                        ctx.source.player.tell('§6§l=== ARÈNE ===');
-                        ctx.source.player.tell('§7Centre : §e' + arenaCenter.x + ' ' + arenaCenter.y + ' ' + arenaCenter.z);
-                        ctx.source.player.tell('§7Rayon : §e' + arenaCenter.radius + ' blocs');
-                        return 1;
-                    })
-                )
             )
     );
     
@@ -1906,6 +2434,7 @@ ServerEvents.commandRegistry(event => {
                     votePhaseActive = false; // Désactiver le vote la nuit
                     nightPhaseActive = true; // Activer la phase de nuit pour les pouvoirs
                     
+                    clearVoteScoreboard(ctx.source.server);
                     // Réinitialiser les pouvoirs de nuit
                     voyantePowerUsed = {};
                     loupVotes = {};
@@ -1948,6 +2477,7 @@ ServerEvents.commandRegistry(event => {
                     votePhaseActive = true; // Activer la phase de vote
                     nightPhaseActive = false; // Désactiver la phase de nuit
                     votes = {}; // Réinitialiser les votes
+                    updateVoteScoreboard(ctx.source.server);
                     
                     // Exécuter l'attaque des loups-garous
                     let loupTarget = null;
@@ -2123,6 +2653,36 @@ ServerEvents.commandRegistry(event => {
                         });
                         
                         maire = null;
+                        return 1;
+                    })
+                )
+            )
+            .then(Commands.literal('successeur')
+                .then(Commands.argument('joueur', Arguments.STRING.create(event))
+                    .executes(ctx => {
+                        const player = ctx.source.player;
+                        const targetName = Arguments.STRING.getResult(ctx, 'joueur');
+                        
+                        // Vérifier si c'est bien l'ancien maire qui parle
+                        if (player.name.string !== maireDeceased) {
+                            player.tell('§cVous n\'êtes pas l\'ancien Maire ou vous n\'avez pas à désigner de successeur.');
+                            return 0;
+                        }
+                        
+                        // Vérifier que le joueur cible existe et est vivant
+                        let targetFound = false;
+                        ctx.source.level.players.forEach(p => {
+                            if (p.name.string.toLowerCase() === targetName.toLowerCase() && !deadPlayers[p.name.string]) {
+                                targetFound = true;
+                                maire = p.name.string;
+                                maireDeceased = null; // Reset
+                                
+                                ctx.source.server.runCommandSilent('tellraw @a ["",{"text":"[Maire] ","color":"gold","bold":true},{"text":"' + player.name.string + ' a nommé ","color":"yellow"},{"text":"' + p.name.string + '","color":"gold","bold":true},{"text":" comme nouveau Maire !","color":"yellow"}]');
+                                p.level.playSound(null, p.blockPosition(), 'minecraft:ui.toast.challenge_complete', 'players', 1.0, 1.0);
+                            }
+                        });
+                        
+                        if (!targetFound) player.tell('§cJoueur introuvable ou mort.');
                         return 1;
                     })
                 )
@@ -2411,29 +2971,30 @@ ServerEvents.commandRegistry(event => {
                 .then(Commands.argument('titre', Arguments.GREEDY_STRING.create(event))
                     .executes(ctx => {
                         try {
-                            const targetName = Arguments.STRING.getResult(ctx, 'joueur');
-                            const titre = Arguments.GREEDY_STRING.getResult(ctx, 'titre');
+                            let tabTargetName = Arguments.STRING.getResult(ctx, 'joueur');
+                            let titre = Arguments.GREEDY_STRING.getResult(ctx, 'titre');
                             // Chercher le joueur
                             let targetPlayer = null;
                             ctx.source.level.players.forEach(p => {
-                                if (p.name.string.toLowerCase() === targetName.toLowerCase()) {
+                                if (p.name.string.toLowerCase() === tabTargetName.toLowerCase()) {
                                     targetPlayer = p;
                                 }
                             });
                             if (!targetPlayer) {
-                                ctx.source.player.tell('§c[Tab] §7Joueur "' + targetName + '" non trouvé !');
+                                ctx.source.player.tell('§c[Tab] §7Joueur "' + tabTargetName + '" non trouvé !');
                                 return 0;
                             }
                             // Sauvegarder le titre
                             playerTitles[targetPlayer.name.string] = titre;
+                            savePlayerTitles(); // Sauvegarder immédiatement
                             // Mettre à jour l'affichage
                             updatePlayerDisplayName(targetPlayer);
-                            const formattedTitle = getFormattedTitle(titre);
-                            ctx.source.player.tell('§a[Tab] §7Titre de §f' + targetPlayer.name.string + ' §7changé en : ' + formattedTitle);
-                            targetPlayer.tell('§a[Tab] §7Votre titre a été changé en : ' + formattedTitle);
+                            const titleDisplay = getFormattedTitle(titre);
+                            ctx.source.player.tell('§a[Tab] §7Titre de §f' + targetPlayer.name.string + ' §7changé en : ' + titleDisplay);
+                            targetPlayer.tell('§a[Tab] §7Votre titre a été changé en : ' + titleDisplay);
                             // Annoncer à tous
                             ctx.source.level.players.forEach(p => {
-                                p.tell('§8[Tab] §f' + targetPlayer.name.string + ' §7est maintenant : ' + formattedTitle.trim());
+                                p.tell('§8[Tab] §f' + targetPlayer.name.string + ' §7est maintenant : ' + titleDisplay.trim());
                             });
                             return 1;
                         } catch (e) {
@@ -2446,26 +3007,22 @@ ServerEvents.commandRegistry(event => {
             .then(Commands.literal('remove')
                 .then(Commands.argument('joueur', Arguments.STRING.create(event))
                     .executes(ctx => {
-                        const targetName = Arguments.STRING.getResult(ctx, 'joueur');
-                        
+                        const removeTargetName = Arguments.STRING.getResult(ctx, 'joueur');
                         let targetPlayer = null;
                         ctx.source.level.players.forEach(p => {
-                            if (p.name.string.toLowerCase() === targetName.toLowerCase()) {
+                            if (p.name.string.toLowerCase() === removeTargetName.toLowerCase()) {
                                 targetPlayer = p;
                             }
                         });
-                        
                         if (!targetPlayer) {
-                            ctx.source.player.tell('§c[Tab] §7Joueur "' + targetName + '" non trouvé !');
+                            ctx.source.player.tell('§c[Tab] §7Joueur "' + removeTargetName + '" non trouvé !');
                             return 0;
                         }
-                        
                         // Supprimer le titre
                         delete playerTitles[targetPlayer.name.string];
-                        
+                        savePlayerTitles(); // Sauvegarder immédiatement
                         // Remettre à Joueur par défaut
                         updatePlayerDisplayName(targetPlayer);
-                        
                         ctx.source.player.tell('§a[Tab] §7Titre de §f' + targetPlayer.name.string + ' §7retiré.');
                         return 1;
                     })
@@ -2488,7 +3045,7 @@ ServerEvents.commandRegistry(event => {
                     return 1;
                 })
             )
-    );
+    )
 });
 
 // Crafting spécial - Armes en argent
@@ -2522,26 +3079,22 @@ ServerEvents.recipes(event => {
 PlayerEvents.loggedIn(event => {
     const player = event.player;
     
-    // Le scoreboard dynamique avec le rôle sera créé automatiquement via PlayerEvents.tick
-    
-    // Appliquer le titre du joueur (ou Joueur par défaut)
-    player.server.scheduleInTicks(20, () => {
-        updatePlayerDisplayName(player);
-    });
+    // Appliquer le titre sauvegardé
+    updatePlayerDisplayName(player);
     
     player.tell('');
     player.tell('§8§l═══════════════════════════════════════════════');
-    player.tell('§6§l           🐺 BIENVENUE DANS LA MEUTE 🐺');
+    player.tell('§6§l              🐺 LOUP-GAROU 🐺');
     player.tell('§8§l═══════════════════════════════════════════════');
-    player.tell('');
-    player.tell('§7Bienvenue dans le village de §eThiercelieux§7.');
-    player.tell('§7La nuit, les §cloups-garous §7chassent...');
-    player.tell('§7Le jour, le village vote pour éliminer les suspects.');
     player.tell('');
     player.tell('§aCommandes :');
     player.tell('§7  /lameute start [loups] §8- Lancer une partie');
     player.tell('§7  /lameute timer auto §8- Timer automatique');
     player.tell('§7  /lameute timer jour [3/5/7] §8- Durée du jour');
+    player.tell('');
+    player.tell('§7Bienvenue dans le village de §eThiercelieux§7.');
+    player.tell('§7La nuit, les §cloups-garous §7chassent...');
+    player.tell('§7Le jour, le village vote pour éliminer les suspects.');
     player.tell('');
     player.tell('§e💡 Votre rôle s\'affiche dans le scoreboard à droite !');
     player.tell('');
@@ -2550,64 +3103,4 @@ PlayerEvents.loggedIn(event => {
     player.tell('§8              Développé par §6§lw9n0 §8🐺');
     player.tell('§8§l═══════════════════════════════════════════════');
     player.tell('');
-});
-
-PlayerEvents.chat(event => {
-    const player = event.player;
-    const playerName = player.name.string;
-    const message = event.message;
-    
-    // Obtenir le titre du joueur
-    const title = playerTitles[playerName] || 'Joueur';
-    const formattedTitle = getFormattedTitle(title);
-    
-    // Annuler le message original
-    event.cancel();
-    
-    // Vérifier si le joueur est MJ
-    const isMJ = title.toLowerCase().includes('mj') || title.toLowerCase().includes('maitre');
-    
-    // Vérifier si le joueur est mort (spectateur)
-    const isDead = deadPlayers[playerName] === true;
-    
-    // Si le joueur est mort, seul le MJ voit son message
-    if (isDead && !isMJ) {
-        player.server.players.forEach(p => {
-            const pTitle = playerTitles[p.name.string] || 'Joueur';
-            const pIsMJ = pTitle.toLowerCase().includes('mj') || pTitle.toLowerCase().includes('maitre');
-            
-            if (pIsMJ) {
-                p.tell('§8[☠ Mort] ' + formattedTitle + '§f' + playerName + ' §7→ §f' + message);
-            }
-        });
-        
-        player.tell('§8[☠ → MJ] §7Votre message a été envoyé au Maître du Jeu.');
-        console.log('[Chat Mort] ' + playerName + ' -> MJ: ' + message);
-        return;
-    }
-    
-    // Si c'est la nuit et le joueur n'est pas MJ
-    if (nightPhaseActive && !isMJ) {
-        player.server.players.forEach(p => {
-            const pTitle = playerTitles[p.name.string] || 'Joueur';
-            const pIsMJ = pTitle.toLowerCase().includes('mj') || pTitle.toLowerCase().includes('maitre');
-            
-            if (pIsMJ) {
-                p.tell('§8[🌙 Nuit] ' + formattedTitle + '§f' + playerName + ' §7→ §f' + message);
-            }
-        });
-        
-        player.tell('§8[🌙 → MJ] §7Votre message a été envoyé au Maître du Jeu.');
-        console.log('[Chat Nuit] ' + playerName + ' -> MJ: ' + message);
-        return;
-    }
-    
-    // Message normal (jour ou MJ)
-    const formattedMessage = formattedTitle + '§f' + playerName + ' §7» §f' + message;
-    
-    player.server.players.forEach(p => {
-        p.tell(formattedMessage);
-    });
-    
-    console.log('[Chat] ' + title + ' ' + playerName + ': ' + message);
 });
