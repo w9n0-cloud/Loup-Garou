@@ -71,7 +71,7 @@ ServerEvents.loaded(event => {
 });
 
 // Sauvegarder les titres quand le serveur s'arrête
-ServerEvents.unload(event => {
+ServerEvents.unloaded(event => {
     savePlayerTitles();
     saveGameConfig();
 });
@@ -112,6 +112,16 @@ function updatePlayerDisplayName(player) {
     player.server.runCommandSilent('team add title_' + playerName.replace(/[^a-zA-Z0-9]/g, '') + ' ""');
     player.server.runCommandSilent('team join title_' + playerName.replace(/[^a-zA-Z0-9]/g, '') + ' ' + playerName);
     player.server.runCommandSilent('team modify title_' + playerName.replace(/[^a-zA-Z0-9]/g, '') + ' prefix ' + JSON.stringify({"text":formattedTitle.replace(/§/g, '\u00A7')}));
+    
+    const teamName = 'title_' + playerName.replace(/[^a-zA-Z0-9]/g, '');
+    
+    try {
+        player.server.runCommandSilent('team add ' + teamName);
+        player.server.runCommandSilent('team join ' + teamName + ' ' + playerName);
+        player.server.runCommandSilent('team modify ' + teamName + ' prefix ' + JSON.stringify({"text":formattedTitle.replace(/§/g, '\u00A7')}));
+    } catch (e) {
+        console.log('[Tab] Erreur updatePlayerDisplayName: ' + e);
+    }
 }
 
 function teleportPlayersInCircle(server) {
@@ -193,10 +203,12 @@ function allNightActionsComplete(level) {
     let hasLoups = false;
     
     level.players.forEach(p => {
+        if (deadPlayers[p.name.string]) return; // Ignorer les morts pour le calcul
+
         if (p.hasTag('voyante')) hasVoyante = true;
         if (p.hasTag('sorciere')) hasSorciere = true;
         if (p.hasTag('salvateur')) hasSalvateur = true;
-        if (p.hasTag('loup_garou')) hasLoups = true;
+        if (p.hasTag('loup_garou') || p.hasTag('loup_blanc') || p.hasTag('loup_alpha')) hasLoups = true;
     });
     
     // Vérifier que chaque rôle présent a agi
@@ -1447,6 +1459,7 @@ ItemEvents.rightClicked('minecraft:bone', event => {
     
     // Correction : Autoriser tous les types de loups à voter
     if (!player.hasTag('loup_garou') && !player.hasTag('loup_blanc') && !player.hasTag('loup_alpha')) return;
+    if (deadPlayers[player.name.string]) return; // Les loups morts ne votent pas
     
     if (!nightPhaseActive) {
         player.tell('§c[Loup-Garou] §7Les loups ne chassent que la nuit...');
@@ -1472,7 +1485,7 @@ ItemEvents.rightClicked('minecraft:bone', event => {
         let nbLoupsVoted = Object.keys(loupVotes).length;
         
         player.level.players.forEach(p => {
-            if (p.hasTag('loup_garou') || p.hasTag('loup_blanc') || p.hasTag('loup_alpha')) nbLoups++;
+            if ((p.hasTag('loup_garou') || p.hasTag('loup_blanc') || p.hasTag('loup_alpha')) && !deadPlayers[p.name.string]) nbLoups++;
         });
         
         if (nbLoupsVoted >= nbLoups) {
@@ -1859,6 +1872,41 @@ PlayerEvents.tick(event => {
     const player = event.player;
     const playerName = player.name.string;
     
+    // Animation Arc-en-ciel pour le grade DEV
+    if (playerTitles[playerName] && playerTitles[playerName].toLowerCase() === 'dev') {
+        // Mettre à jour toutes les 4 ticks (0.2s)
+        if (player.age % 4 === 0) {
+            const colors = ['§4', '§c', '§6', '§e', '§2', '§a', '§b', '§3', '§1', '§9', '§d', '§5'];
+            const index = Math.floor((Date.now() / 150) % colors.length);
+            const color = colors[index];
+            const rainbowTitle = color + '§l[DEV] ';
+            
+            const teamName = 'title_' + playerName.replace(/[^a-zA-Z0-9]/g, '');
+            player.server.runCommandSilent('team modify ' + teamName + ' prefix ' + JSON.stringify({"text":rainbowTitle.replace(/§/g, '\u00A7')}));
+        }
+    }
+
+    // Animation OWNER (Rouge/Or clignotant)
+    if (playerTitles[playerName] && playerTitles[playerName].toLowerCase() === 'owner') {
+        // Mettre à jour toutes les 10 ticks (0.5s)
+        if (player.age % 10 === 0) {
+            const colors = ['§4', '§6']; // Rouge foncé et Or
+            const index = Math.floor((Date.now() / 500) % colors.length);
+            const color = colors[index];
+            const ownerTitle = color + '§l[OWNER] ';
+            
+            const teamName = 'title_' + playerName.replace(/[^a-zA-Z0-9]/g, '');
+            player.server.runCommandSilent('team modify ' + teamName + ' prefix ' + JSON.stringify({"text":ownerTitle.replace(/§/g, '\u00A7')}));
+        }
+    }
+
+    // Particules VIP (Étoiles vertes)
+    if (playerTitles[playerName] && playerTitles[playerName].toLowerCase() === 'vip') {
+        if (player.age % 5 === 0) {
+            level.spawnParticles('minecraft:happy_villager', player.x, player.y + 2.2, player.z, 1, 0.3, 0.1, 0.3, 0);
+        }
+    }
+
     // Mettre à jour le scoreboard toutes les 2 secondes (40 ticks)
     const now = Date.now();
     if (!lastScoreboardUpdate[playerName] || now - lastScoreboardUpdate[playerName] > 2000) {
@@ -1997,8 +2045,10 @@ PlayerEvents.chat(event => {
         });
         return;
     }
+});
     
     // Si c'est la nuit, que le joueur est un loup et qu'il est vivant
+    if (nightPhaseActive && !deadPlayers[playerName] && (player.tags.contains('loup_garou') || player.tags.contains('loup_blanc') || player.tags.contains('loup_alpha') || player.tags.contains('infect'))) {
     if (nightPhaseActive && !deadPlayers[playerName] && (player.hasTag('loup_garou') || player.hasTag('loup_blanc') || player.hasTag('loup_alpha') || player.hasTag('infect'))) {
         // Annuler le message public (personne d'autre ne le verra)
         event.cancel();
@@ -2028,7 +2078,21 @@ PlayerEvents.chat(event => {
             }
         });
     }
-});
+
+    // Formatage du chat normal (pour enlever les < >)
+    if (!event.cancelled) {
+        event.cancel();
+        
+        const title = playerTitles[playerName] || 'Joueur';
+        const formattedTitle = getFormattedTitle(title);
+        
+        const chatMessage = formattedTitle + '§f' + playerName + ' §8» §f' + event.message;
+        
+        event.server.players.forEach(p => {
+            p.tell(chatMessage);
+        });
+    }
+};
 
 // Commandes personnalisées pour le maître du jeu
 ServerEvents.commandRegistry(event => {
@@ -2037,6 +2101,32 @@ ServerEvents.commandRegistry(event => {
     // Fonction pour vérifier si le joueur est OP (niveau 2+)
     const requiresOP = (source) => source.hasPermission(2);
     
+    // Commande /fly pour les VIPs
+    event.register(
+        Commands.literal('fly')
+            .executes(ctx => {
+                const player = ctx.source.player;
+                const playerName = player.name.string;
+                const title = playerTitles[playerName] || '';
+                
+                if (title.toLowerCase() !== 'vip' && !requiresOP(ctx.source)) {
+                    player.tell('§cCette commande est réservée aux VIPs !');
+                    return 0;
+                }
+                
+                if (gameStarted && !deadPlayers[playerName] && !requiresOP(ctx.source)) {
+                    player.tell('§cImpossible de voler pendant la partie !');
+                    return 0;
+                }
+                
+                player.abilities.mayfly = !player.abilities.mayfly;
+                player.abilities.flying = player.abilities.mayfly;
+                player.onUpdateAbilities();
+                player.tell(player.abilities.mayfly ? '§aVol activé !' : '§cVol désactivé.');
+                return 1;
+            })
+    );
+
     // Fonction pour calculer la distribution équitable des rôles
     function calculateRoleDistribution(playerCount) {
         // Calcul automatique du nombre de loups (environ 1 pour 4-5 joueurs)
@@ -2158,9 +2248,6 @@ ServerEvents.commandRegistry(event => {
                     // Mélanger les rôles
                     roles = shuffleArray(roles);
                         
-                        // Mélanger les rôles
-                        roles = shuffleArray(roles);
-                        
                         // Annonce dramatique
                         ctx.source.level.players.forEach(p => {
                             p.tell('');
@@ -2206,9 +2293,9 @@ ServerEvents.commandRegistry(event => {
                         renardPowerUsed = {};
                         fluteCharmed = {};
                         
-                        // Mettre tout le monde en survival
+                        // Mettre tout le monde en aventure (Mode Plateau)
                         ctx.source.level.players.forEach(p => {
-                            ctx.source.server.runCommandSilent('gamemode survival ' + p.name.string);
+                            ctx.source.server.runCommandSilent('gamemode adventure ' + p.name.string);
                         });
                         
                         // Distribuer les cartes à chaque joueur avec un délai
@@ -2982,6 +3069,7 @@ ServerEvents.commandRegistry(event => {
                             });
                             if (!targetPlayer) {
                                 ctx.source.player.tell('§c[Tab] §7Joueur "' + tabTargetName + '" non trouvé !');
+                                if (ctx.source.player) ctx.source.player.tell('§c[Tab] §7Joueur "' + tabTargetName + '" non trouvé !');
                                 return 0;
                             }
                             // Sauvegarder le titre
@@ -2991,6 +3079,8 @@ ServerEvents.commandRegistry(event => {
                             updatePlayerDisplayName(targetPlayer);
                             const titleDisplay = getFormattedTitle(titre);
                             ctx.source.player.tell('§a[Tab] §7Titre de §f' + targetPlayer.name.string + ' §7changé en : ' + titleDisplay);
+                            
+                            if (ctx.source.player) ctx.source.player.tell('§a[Tab] §7Titre de §f' + targetPlayer.name.string + ' §7changé en : ' + titleDisplay);
                             targetPlayer.tell('§a[Tab] §7Votre titre a été changé en : ' + titleDisplay);
                             // Annoncer à tous
                             ctx.source.level.players.forEach(p => {
@@ -2999,6 +3089,8 @@ ServerEvents.commandRegistry(event => {
                             return 1;
                         } catch (e) {
                             ctx.source.player.tell('§c[Tab] §7Erreur: ' + e + (e && e.stack ? ('\n' + e.stack) : ''));
+                            console.error('[Tab Error] ' + e);
+                            if (ctx.source.player) ctx.source.player.tell('§c[Tab] §7Erreur: ' + e);
                             return 0;
                         }
                     })
@@ -3009,24 +3101,50 @@ ServerEvents.commandRegistry(event => {
                     .executes(ctx => {
                         const removeTargetName = Arguments.STRING.getResult(ctx, 'joueur');
                         let targetPlayer = null;
+                        
+                        // Chercher le joueur en ligne
                         ctx.source.level.players.forEach(p => {
                             if (p.name.string.toLowerCase() === removeTargetName.toLowerCase()) {
                                 targetPlayer = p;
                             }
                         });
-                        if (!targetPlayer) {
-                            ctx.source.player.tell('§c[Tab] §7Joueur "' + removeTargetName + '" non trouvé !');
-                            return 0;
+                        
+                        if (targetPlayer) {
+                            // Joueur en ligne : Mise à jour immédiate
+                            delete playerTitles[targetPlayer.name.string];
+                            savePlayerTitles();
+                            updatePlayerDisplayName(targetPlayer);
+                            ctx.source.player.tell('§a[Tab] §7Titre de §f' + targetPlayer.name.string + ' §7retiré (remis à Joueur).');
+                        } else {
+                            // Joueur hors ligne : Chercher dans la base de données
+                            let foundKey = Object.keys(playerTitles).find(k => k.toLowerCase() === removeTargetName.toLowerCase());
+                            
+                            if (foundKey) {
+                                delete playerTitles[foundKey];
+                                savePlayerTitles();
+                                ctx.source.player.tell('§a[Tab] §7Titre de §f' + foundKey + ' §7retiré (Joueur hors ligne).');
+                            } else {
+                                ctx.source.player.tell('§c[Tab] §7Joueur "' + removeTargetName + '" non trouvé (ni en ligne, ni dans les titres).');
+                                return 0;
+                            }
                         }
-                        // Supprimer le titre
-                        delete playerTitles[targetPlayer.name.string];
-                        savePlayerTitles(); // Sauvegarder immédiatement
-                        // Remettre à Joueur par défaut
-                        updatePlayerDisplayName(targetPlayer);
-                        ctx.source.player.tell('§a[Tab] §7Titre de §f' + targetPlayer.name.string + ' §7retiré.');
                         return 1;
                     })
                 )
+            )
+            .then(Commands.literal('resetall')
+                .executes(ctx => {
+                    playerTitles = {};
+                    savePlayerTitles();
+                    
+                    // Mettre à jour tous les joueurs connectés
+                    ctx.source.server.players.forEach(p => {
+                        updatePlayerDisplayName(p);
+                    });
+                    
+                    ctx.source.player.tell('§a[Tab] §7Tous les titres ont été réinitialisés.');
+                    return 1;
+                })
             )
             .then(Commands.literal('list')
                 .executes(ctx => {
@@ -3046,33 +3164,6 @@ ServerEvents.commandRegistry(event => {
                 })
             )
     )
-});
-
-// Crafting spécial - Armes en argent
-ServerEvents.recipes(event => {
-    // Épée en argent (très efficace contre les loups-garous)
-    event.shaped('minecraft:iron_sword', [
-        ' I ',
-        ' I ',
-        ' S '
-    ], {
-        I: 'minecraft:iron_ingot',
-        S: 'minecraft:stick'
-    }).id('lameute:silver_sword');
-    
-    // Potion de la Sorcière - Vie
-    event.shapeless('minecraft:potion', [
-        'minecraft:glass_bottle',
-        'minecraft:glistering_melon_slice',
-        'minecraft:golden_apple'
-    ]).id('lameute:potion_vie');
-    
-    // Potion de la Sorcière - Mort
-    event.shapeless('minecraft:splash_potion', [
-        'minecraft:glass_bottle',
-        'minecraft:wither_rose',
-        'minecraft:spider_eye'
-    ]).id('lameute:potion_mort');
 });
 
 // Message de bienvenue et application du titre
