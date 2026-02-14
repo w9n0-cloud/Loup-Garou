@@ -274,8 +274,6 @@ docs(readme): met à jour la liste des mods
 
 ## 📞 Questions ?
 
-- 💬 **Discord** : [Lien du serveur Discord]
-- 📧 **Email** : w9n0@example.com
 - 🐛 **Issues** : [GitHub Issues](../../issues)
 
 ---
