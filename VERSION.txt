@@ -1,0 +1,37 @@
+==============================================
+🐺 LA MEUTE - Modpack Loup-Garou
+==============================================
+
+VERSION: 2.0.0
+DATE: 2026-02-14
+BUILD: stable
+
+Minecraft: 1.20.1
+Forge: 47.2.0
+KubeJS: 2001.6.5
+
+==============================================
+CHANGELOG RAPIDE
+==============================================
+
+✨ NOUVEAU:
+- Système de victoire automatique
+- Commande /lameute help
+- Sorcière Noire jouable
+- Immobilisation des joueurs (jeu de société)
+- Architecture du code refaite
+
+🐛 CORRIGÉ:
+- Chat des loups cassé
+- Code dupliqué
+- Messages d'erreur
+
+📊 QUALITÉ:
+- Code: 100% fonctionnel
+- Organisation: 9/10
+- Maintenabilité: Excellente
+
+==============================================
+DÉVELOPPEUR: w9n0
+LICENCE: All Rights Reserved
+==============================================

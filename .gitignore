@@ -1,0 +1,87 @@
+# ════════════════════════════════════════════════════════════
+# 🐺 LA MEUTE - .gitignore
+# ════════════════════════════════════════════════════════════
+
+# ═══ Fichiers système ═══
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# ═══ IDEs et éditeurs ═══
+.vscode/
+.idea/
+*.iml
+*.iws
+.eclipse/
+.settings/
+.project
+.classpath
+
+# ═══ Fichiers temporaires ═══
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.cache/
+
+# ═══ Données du serveur (ne pas commit) ═══
+server/world/
+server/logs/
+server/crash-reports/
+server/backups/
+server/*.json
+server/*.dat
+server/*.properties
+!server/server.properties.example
+
+# ═══ Données KubeJS (générées) ═══
+overrides/kubejs/data/
+overrides/kubejs/assets/
+overrides/kubejs/exported/
+overrides/kubejs/startup.log
+overrides/kubejs/client.log
+overrides/kubejs/server.log
+
+# ═══ Fichiers de développement ═══
+node_modules/
+npm-debug.log
+.env
+.env.local
+
+# ═══ Fichiers de build ═══
+dist/
+build/
+*.zip
+!LaMeute-Client.zip
+!LaMeute-Server.zip
+
+# ═══ Fichiers de mods (trop volumineux) ═══
+# On garde juste un .gitkeep pour la structure
+overrides/mods/*.jar
+!overrides/mods/.gitkeep
+
+# ═══ Resourcepacks et Shaderpacks (optionnel) ═══
+# Décommenter si trop volumineux
+# overrides/resourcepacks/*.zip
+# overrides/shaderpacks/*.zip
+
+# ═══ Fichiers de configuration utilisateur ═══
+overrides/options.txt
+overrides/servers.dat
+overrides/usercache.json
+overrides/usernamecache.json
+
+# ═══ Sauvegardes et crashs ═══
+backups/
+crash-reports/
+*.crash
+
+# ═══ Outils de développement ═══
+.claude/
+.vscode/
+.idea/
+
+# ═══ Git ═══
+*.orig
