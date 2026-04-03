@@ -694,10 +694,11 @@
             </div>
             <h1>LA MEUTE</h1>
             <p class="tagline">Le Loup-Garou comme vous ne l'avez jamais joué</p>
+            <p style="color: var(--gray); font-size: 1.1em; margin-bottom: 15px;">26 rôles • Items par tour • Médium chat en direct • Victoires solo</p>
             <div class="version">
                 <span>Minecraft 1.20.1</span>
                 <span>Forge 47.2.0</span>
-                <span>KubeJS</span>
+                <span>26 Rôles</span>
             </div>
         </div>
         <div class="scroll-indicator">
@@ -744,32 +745,47 @@
             <div class="feature-card">
                 <span class="feature-icon">🎴</span>
                 <h4>Distribution Automatique</h4>
-                <p>Les rôles sont distribués secrètement à chaque joueur avec une animation dramatique et des effets sonores immersifs.</p>
+                <p>Les rôles sont distribués secrètement avec une animation dramatique. Clic droit pour retourner sa carte !</p>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">⏱️</span>
                 <h4>Timer Intelligent</h4>
-                <p>Cycle jour/nuit automatique avec barre d'XP. Configurable entre 3, 5 ou 7 minutes selon l'intensité souhaitée.</p>
+                <p>Cycle jour/nuit automatique avec barre d'XP. La nuit se termine plus vite si tous les rôles ont joué.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🎒</span>
+                <h4>Items par Tour</h4>
+                <p>Les items arrivent uniquement quand c'est votre tour de jouer et sont retirés à l'aube. Comme le vrai jeu.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🔮</span>
+                <h4>Médium - Chat avec les morts</h4>
+                <p>Le Médium ouvre un canal privé de 30 secondes avec le dernier mort. Discussion en temps réel !</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">💀</span>
+                <h4>Système de Mort Centralisé</h4>
+                <p>Amoureux, Chasseur, Chevalier, Ancien, Maire — toutes les chaînes de mort gérées automatiquement.</p>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">🗳️</span>
                 <h4>Vote Interactif</h4>
-                <p>Votez en cliquant sur les joueurs. Clic droit pour voter, clic gauche pour annuler. Simple et intuitif.</p>
+                <p>Votez en cliquant sur les joueurs. Vote du Maire x2, Corbeau +2, Idiot bloqué. Votes publics ou anonymes.</p>
             </div>
             <div class="feature-card">
-                <span class="feature-icon">🌙</span>
-                <h4>Nuit Immersive</h4>
-                <p>Effet d'aveuglement pendant la nuit. Seuls les loups-garous peuvent voir et se retrouver entre eux.</p>
+                <span class="feature-icon">📋</span>
+                <h4>Récap de Fin de Partie</h4>
+                <p>À la fin, tous les rôles sont révélés avec le statut vivant/mort de chaque joueur. Pas de doute !</p>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">📍</span>
                 <h4>Système d'Arène</h4>
-                <p>Téléportation automatique de tous les joueurs en cercle, face au centre. Parfait pour les débats.</p>
+                <p>Téléportation automatique en cercle face au centre. Immobilisation jeu de société. Parfait pour les débats.</p>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">🏷️</span>
                 <h4>Titres Personnalisés</h4>
-                <p>Attribuez des titres visibles dans le TAB et le chat. Maître du jeu, VIP, et bien plus.</p>
+                <p>DEV arc-en-ciel, OWNER clignotant, VIP particules, MJ détection auto. Visibles dans le TAB et le chat.</p>
             </div>
         </div>
     </section>
@@ -810,16 +826,39 @@
             <div class="command-group">
                 <h4>📍 Arène</h4>
                 <div class="command-item">
-                    <code>/lameute arene set</code>
+                    <code>/lameute point</code>
                     <span>Définit le centre de l'arène à votre position</span>
                 </div>
                 <div class="command-item">
-                    <code>/lameute arene rayon &lt;2-20&gt;</code>
+                    <code>/lameute point rayon &lt;2-20&gt;</code>
                     <span>Modifie le rayon du cercle de téléportation</span>
                 </div>
                 <div class="command-item">
-                    <code>/lameute arene tp</code>
+                    <code>/lameute spawn</code>
                     <span>Téléporte tous les joueurs en cercle</span>
+                </div>
+            </div>
+            <div class="command-group">
+                <h4>🌙 MJ - Appel des Rôles</h4>
+                <div class="command-item">
+                    <code>/lameute appel loups</code>
+                    <span>Réveille les loups (+ leur donne les items)</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute appel voyante</code>
+                    <span>Réveille la voyante (+ donne l'œil d'araignée)</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute appel sorciere</code>
+                    <span>Réveille la sorcière (+ donne les potions restantes)</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute nuit</code>
+                    <span>Passe à la nuit manuellement</span>
+                </div>
+                <div class="command-item">
+                    <code>/lameute jour</code>
+                    <span>Passe au jour et résout l'attaque des loups</span>
                 </div>
             </div>
             <div class="command-group">
@@ -837,114 +876,144 @@
     </section>
 
     <section id="roles">
-        <h2 class="section-title">Les 20 Rôles</h2>
-        <div class="roles-grid">
+        <h2 class="section-title">Les 26 Rôles</h2>
+
+        <h3 style="color: var(--red); font-family: 'Cinzel', serif; font-size: 1.5em; margin-bottom: 20px; text-align: center;">🐺 Camp des Loups</h3>
+        <div class="roles-grid" style="margin-bottom: 60px;">
             <div class="role-card loup">
                 <span class="role-icon">🐺</span>
                 <h5>Loup-Garou</h5>
-                <p>Dévore un villageois chaque nuit</p>
+                <p>Dévore un villageois chaque nuit avec la meute</p>
             </div>
-            <div class="role-card village">
-                <span class="role-icon">👨‍🌾</span>
-                <h5>Villageois</h5>
-                <p>Doit éliminer tous les loups</p>
-            </div>
-            <div class="role-card special">
-                <span class="role-icon">🔮</span>
-                <h5>Voyante</h5>
-                <p>Découvre le rôle d'un joueur</p>
-            </div>
-            <div class="role-card special">
-                <span class="role-icon">🧪</span>
-                <h5>Sorcière</h5>
-                <p>Potions de vie et de mort</p>
-            </div>
-            <div class="role-card special">
-                <span class="role-icon">🏹</span>
-                <h5>Chasseur</h5>
-                <p>Tire sur quelqu'un en mourant</p>
-            </div>
-            <div class="role-card special">
-                <span class="role-icon">💘</span>
-                <h5>Cupidon</h5>
-                <p>Lie deux amoureux à jamais</p>
-            </div>
-            <div class="role-card special">
-                <span class="role-icon">🛡️</span>
-                <h5>Salvateur</h5>
-                <p>Protège un joueur la nuit</p>
-            </div>
-            <div class="role-card special">
-                <span class="role-icon">👧</span>
-                <h5>Petite Fille</h5>
-                <p>Peut espionner les loups</p>
-            </div>
-            <div class="role-card special">
-                <span class="role-icon">👴</span>
-                <h5>Ancien</h5>
-                <p>Résiste à la première attaque</p>
-            </div>
-            <div class="role-card special">
-                <span class="role-icon">🤡</span>
-                <h5>Idiot du Village</h5>
-                <p>Survit au vote du village</p>
-            </div>
-            <div class="role-card loup">
+            <div class="role-card solo">
                 <span class="role-icon">🐺</span>
                 <h5>Loup Blanc</h5>
-                <p>Tue aussi un loup une nuit sur deux</p>
-            </div>
-            <div class="role-card solo">
-                <span class="role-icon">😇</span>
-                <h5>Ange</h5>
-                <p>Doit mourir au premier vote</p>
-            </div>
-            <div class="role-card solo">
-                <span class="role-icon">🎵</span>
-                <h5>Joueur de Flûte</h5>
-                <p>Charme tous les joueurs pour gagner</p>
-            </div>
-            <div class="role-card special">
-                <span class="role-icon">🐦</span>
-                <h5>Corbeau</h5>
-                <p>Accuse un joueur : 2 votes contre lui</p>
-            </div>
-            <div class="role-card special">
-                <span class="role-icon">🦊</span>
-                <h5>Renard</h5>
-                <p>Flaire si un loup est parmi 3 joueurs</p>
-            </div>
-            <div class="role-card village">
-                <span class="role-icon">🐐</span>
-                <h5>Bouc Émissaire</h5>
-                <p>Meurt en cas d'égalité au vote</p>
+                <p>SOLO — Tue un loup 1 nuit/2. Doit être le dernier vivant</p>
             </div>
             <div class="role-card loup">
                 <span class="role-icon">🐺</span>
                 <h5>Loup Alpha</h5>
-                <p>Peut infecter un villageois</p>
+                <p>Chef de meute. Peut infecter un villageois</p>
             </div>
             <div class="role-card loup">
                 <span class="role-icon">🦠</span>
                 <h5>Infecté</h5>
-                <p>Villageois converti par le Loup Alpha</p>
+                <p>Apparaît Villageois mais joue avec les loups</p>
+            </div>
+        </div>
+
+        <h3 style="color: var(--blue); font-family: 'Cinzel', serif; font-size: 1.5em; margin-bottom: 20px; text-align: center;">🏠 Camp du Village</h3>
+        <div class="roles-grid" style="margin-bottom: 60px;">
+            <div class="role-card village">
+                <span class="role-icon">👨‍🌾</span>
+                <h5>Villageois</h5>
+                <p>Doit éliminer tous les loups par le vote</p>
             </div>
             <div class="role-card special">
+                <span class="role-icon">👁</span>
+                <h5>Voyante</h5>
+                <p>Découvre le vrai rôle d'un joueur chaque nuit</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">⚗</span>
+                <h5>Sorcière</h5>
+                <p>Potion de vie (sauve la victime) + potion de mort</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">🏹</span>
+                <h5>Chasseur</h5>
+                <p>Tire une dernière flèche en mourant</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">💕</span>
+                <h5>Cupidon</h5>
+                <p>Lie deux amoureux. Si l'un meurt, l'autre aussi</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">🛡</span>
+                <h5>Salvateur</h5>
+                <p>Protège un joueur chaque nuit (pas le même 2x)</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">👀</span>
+                <h5>Petite Fille</h5>
+                <p>Espionne le chat des loups (brouillé à 30%)</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">👴</span>
+                <h5>Ancien</h5>
+                <p>Survit à 1 attaque. Tué par le village = pouvoirs perdus</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">🤡</span>
+                <h5>Idiot du Village</h5>
+                <p>Survit au vote mais perd son droit de vote</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">🐦</span>
+                <h5>Corbeau</h5>
+                <p>Accuse un joueur chaque nuit (+2 votes)</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">🦊</span>
+                <h5>Renard</h5>
+                <p>Flaire un groupe de 3 joueurs pour trouver un loup</p>
+            </div>
+            <div class="role-card village">
+                <span class="role-icon">🐐</span>
+                <h5>Bouc Émissaire</h5>
+                <p>Meurt automatiquement en cas d'égalité au vote</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">⚔</span>
+                <h5>Chevalier</h5>
+                <p>Si un loup le dévore, un loup meurt aussi</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">🔮</span>
+                <h5>Médium</h5>
+                <p>Discute 30s avec le dernier mort chaque nuit</p>
+            </div>
+            <div class="role-card special">
+                <span class="role-icon">👯</span>
+                <h5>Sœurs (x2)</h5>
+                <p>Se connaissent mutuellement dès le début</p>
+            </div>
+        </div>
+
+        <h3 style="color: var(--gold); font-family: 'Cinzel', serif; font-size: 1.5em; margin-bottom: 20px; text-align: center;">⚡ Rôles Spéciaux / Solo</h3>
+        <div class="roles-grid">
+            <div class="role-card solo">
+                <span class="role-icon">😇</span>
+                <h5>Ange</h5>
+                <p>Gagne s'il est éliminé au premier vote</p>
+            </div>
+            <div class="role-card solo">
+                <span class="role-icon">🎵</span>
+                <h5>Joueur de Flûte</h5>
+                <p>Charme 2 joueurs/nuit. Gagne si tous sont charmés</p>
+            </div>
+            <div class="role-card solo">
                 <span class="role-icon">🖤</span>
                 <h5>Sorcière Noire</h5>
                 <p>Maudit un joueur. S'il meurt par vote, elle gagne !</p>
             </div>
-            <div class="role-card special">
-                <span class="role-icon">⚔️</span>
-                <h5>Chevalier</h5>
-                <p>Si un loup le tue, il meurt aussi</p>
+            <div class="role-card solo">
+                <span class="role-icon">🔥</span>
+                <h5>Pyromane</h5>
+                <p>Asperge 2 joueurs/nuit. Peut tout brûler d'un coup !</p>
+            </div>
+            <div class="role-card solo">
+                <span class="role-icon">🐕</span>
+                <h5>Chien-Loup</h5>
+                <p>Choisit au début : rejoindre les loups ou le village</p>
             </div>
         </div>
     </section>
 
     <footer>
         <div class="footer-logo">🐺 LA MEUTE</div>
-        <p class="footer-info">Minecraft 1.20.1 • Forge 47.2.0 • KubeJS</p>
+        <p class="footer-info">Minecraft 1.20.1 • Forge 47.2.0 • 26 Rôles • 4300+ lignes de code</p>
         <p class="credits">Développé par w9n0</p>
     </footer>
 
